@@ -106,12 +106,12 @@ export function VolunteerDashboard() {
   // Number of elders flagged as needing assistance right now.
   const needsHelpCount = ELDERLY_PEOPLE.filter((elder) => elder.status === 'needs-assistance').length;
 
-  // Elders whose name, city, address or any condition contains the search text (case-insensitive).
+  // Elders whose name, area, address or any condition contains the search text (case-insensitive).
   const needle = query.trim().toLowerCase();
   const visibleElders = needle
     ? ELDERLY_PEOPLE.filter((elder) =>
-        [elder.name, elder.city, elder.address, ...elder.conditions].some((field) =>
-          field.toLowerCase().includes(needle),
+        [elder.displayName, elder.area, elder.address, ...elder.conditions.map((c) => c.name)].some(
+          (field) => field.toLowerCase().includes(needle),
         ),
       )
     : ELDERLY_PEOPLE;
@@ -316,9 +316,9 @@ export function VolunteerDashboard() {
               <li key={elder.id} className="card" style={{ listStyle: 'none', padding: '1rem' }}>
                 <div style={rowStyle}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <Avatar name={elder.name} tone="teal" size="md" />
+                    <Avatar name={elder.displayName} tone="teal" size="md" />
                     <div>
-                      <strong>{elder.name}</strong>
+                      <strong>{elder.displayName}</strong>
                       <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
                         {elder.age} {t('volunteer.yearsOld')}
                       </div>
@@ -331,9 +331,11 @@ export function VolunteerDashboard() {
                   )}
                 </div>
                 <div style={{ ...responsiveGrid('180px'), marginTop: '0.75rem' }}>
-                  <Detail label={t('volunteer.city')}>{elder.city}</Detail>
+                  <Detail label={t('volunteer.city')}>{elder.area}</Detail>
                   <Detail label={t('volunteer.address')}>{elder.address}</Detail>
-                  <Detail label={t('volunteer.conditions')}>{elder.conditions.join(', ')}</Detail>
+                  <Detail label={t('volunteer.conditions')}>
+                    {elder.conditions.map((condition) => condition.name).join(', ')}
+                  </Detail>
                 </div>
               </li>
             ))}

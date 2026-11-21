@@ -13,6 +13,7 @@ import { authenticate as defaultAuthenticate, requireUser } from "../middleware/
 import { authorize, authorizeLinked, canAccessElder } from "../middleware/authorize.js";
 import CareLink, { CARELINK_PERMISSIONS } from "../models/CareLink.js";
 import Elder from "../models/Elder.js";
+import User, { toPublicUser } from "../models/User.js";
 import {
   INVITE_TTL_DAYS,
   generateInviteCode,
@@ -22,14 +23,22 @@ import { ApiError } from "../utils/ApiError.js";
 
 const DEFAULT_INVITE_PERMISSIONS = ["viewMedicines"];
 
+// volunteer/caretaker only: those two roles are invite-only (see auth.routes.js).
+// elder/family are never set here - they self-register normally, before accepting.
+const INVITE_ROLES = ["volunteer", "caretaker"];
+
 const inviteSchema = z.object({
   email: z.string().trim().toLowerCase().email().optional(),
   relation: z.string().trim().optional(),
   permissions: z.array(z.enum(CARELINK_PERMISSIONS)).optional(),
+  inviteRole: z.enum(INVITE_ROLES).optional(),
 });
 
 const acceptSchema = z.object({
   code: z.string().trim().min(6),
+  // Only required when the accepting account doesn't exist yet (see the
+  // accept route below); optional here so existing-account accepts can omit it.
+  name: z.string().trim().min(1).optional(),
 });
 
 const linkUpdateSchema = z.object({
@@ -69,6 +78,7 @@ export function createCareLinkRouter(deps = {}) {
   const authDeps = deps.authDeps ?? {};
   const CareLinkModel = deps.CareLinkModel ?? CareLink;
   const ElderModel = deps.ElderModel ?? Elder;
+  const UserModel = deps.UserModel ?? User;
 
   const router = Router();
 
@@ -98,6 +108,7 @@ export function createCareLinkRouter(deps = {}) {
         inviteEmail: body.email,
         relation: body.relation,
         permissions: body.permissions ?? DEFAULT_INVITE_PERMISSIONS,
+        inviteRole: body.inviteRole,
         status: "pending",
         invitedBy: req.user._id,
         inviteCodeHash: hashInviteCode(code),
@@ -112,12 +123,16 @@ export function createCareLinkRouter(deps = {}) {
           expiresAt: link.inviteExpiresAt,
           inviteEmail: link.inviteEmail,
           permissions: link.permissions,
+          inviteRole: link.inviteRole ?? null,
         },
       });
     }
   );
 
-  router.post("/care-links/accept", authenticate, requireUser, async (req, res) => {
+  // No requireUser here, deliberately: a brand-new Firebase sign-in with no
+  // User yet must still be able to accept an invite that carries an
+  // inviteRole (volunteer/caretaker), which creates their account below.
+  router.post("/care-links/accept", authenticate, async (req, res) => {
     const body = parseBody(acceptSchema, req.body, "Invalid invite code");
 
     const link = await CareLinkModel.findOne({
@@ -127,7 +142,28 @@ export function createCareLinkRouter(deps = {}) {
     }).select("+inviteCodeHash");
     if (!link) throw ApiError.notFound("Invite not found or expired");
 
-    if (link.userId && String(link.userId) !== String(req.user._id)) {
+    let user = req.user;
+    if (!user) {
+      if (!link.inviteRole) {
+        // A family-to-family invite (no inviteRole): the invitee must
+        // register normally first, since elder/family are not invite-only.
+        throw ApiError.forbidden(
+          "No account exists for this sign-in yet. Register via POST /auth/register first, then accept this invite."
+        );
+      }
+      if (!body.name) {
+        throw ApiError.validationFailed("name is required to create your account", {
+          issues: [{ path: "name", message: "name is required" }],
+        });
+      }
+      user = await UserModel.create({
+        authUid: req.auth.uid,
+        name: body.name,
+        role: link.inviteRole,
+      });
+    }
+
+    if (link.userId && String(link.userId) !== String(user._id)) {
       throw ApiError.conflict("Invite has already been accepted by another account");
     }
 
@@ -135,23 +171,23 @@ export function createCareLinkRouter(deps = {}) {
     // has a link to the same elder, return it instead of creating a duplicate.
     const existing = await CareLinkModel.findOne({
       elderId: link.elderId,
-      userId: req.user._id,
+      userId: user._id,
     });
     if (existing && String(existing._id) !== String(link._id)) {
       if (existing.status === "active") {
-        res.json({ carelink: toPublicCareLink(existing) });
+        res.json({ carelink: toPublicCareLink(existing), user: toPublicUser(user) });
         return;
       }
       throw ApiError.conflict("This account already has a revoked link to this elder");
     }
 
-    link.userId = req.user._id;
+    link.userId = user._id;
     link.status = "active";
     link.inviteCodeHash = undefined;
     link.inviteExpiresAt = undefined;
     await link.save();
 
-    res.json({ carelink: toPublicCareLink(link) });
+    res.json({ carelink: toPublicCareLink(link), user: toPublicUser(user) });
   });
 
   router.get(

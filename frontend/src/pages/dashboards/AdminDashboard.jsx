@@ -162,7 +162,7 @@ export default function AdminDashboard() {
   };
 
   // Resolves an elder id to a display name for family links.
-  const elderName = (id) => ELDERLY_PEOPLE.find((e) => e.id === id)?.name ?? '—';
+  const elderName = (id) => ELDERLY_PEOPLE.find((e) => e.id === id)?.displayName ?? '—';
 
   // Labelled status badge helper; uses the translated label when one exists.
   const statusBadge = (status) => {
@@ -328,7 +328,7 @@ export default function AdminDashboard() {
                     <option value="">{t('admin.assignCaretaker')}</option>
                     {ELDERLY_PEOPLE.map((e, j) => (
                       <option key={e.id ?? j} value={e.id ?? j}>
-                        {e.name}
+                        {e.displayName}
                       </option>
                     ))}
                   </select>
@@ -350,7 +350,7 @@ export default function AdminDashboard() {
                   {FAMILY_MEMBERS.map((f, i) => (
                     <tr key={f.id ?? i}>
                       <td>{f.name}</td>
-                      <td>{elderName(f.elderId ?? f.linkedElderId)}</td>
+                      <td>{elderName(f.elderId)}</td>
                     </tr>
                   ))}
                 </tbody>

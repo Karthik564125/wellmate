@@ -102,7 +102,7 @@ export function InsurancePage() {
 
               {/* 4-metric grid: coverage, premium, due date, renewal */}
               <div className="policy-metrics">
-                <MetricBox label={t('pages.insurance.coverage')} value={formatRupees(policy.coverageAmount)} accent />
+                <MetricBox label={t('pages.insurance.coverage')} value={formatRupees(policy.sumInsured)} accent />
                 <MetricBox label={t('pages.insurance.annualPremium')} value={formatRupees(policy.annualPremium)} />
                 <MetricBox label={t('pages.insurance.premiumDue')} value={policy.premiumDueDate} />
                 <MetricBox label={t('pages.insurance.renewal')} value={policy.renewalDate} />

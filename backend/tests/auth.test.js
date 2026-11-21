@@ -176,6 +176,30 @@ test("canAccessElder with no CareLink but matching Elder.userId (owner) -> true"
 
 // ---- POST /api/v1/auth/register ----
 
+test("register with role volunteer -> 400 VALIDATION_FAILED (invite-only, not self-registerable)", async () => {
+  const app = buildAuthApp({
+    authenticate: createAuthenticate({ verifyIdToken, UserModel: fakeUserModel(null) }),
+    UserModel: fakeUserModel(null),
+  });
+  await withServer(app, async (base) => {
+    const res = await postRegister(base, { name: "Sandeep", role: "volunteer" });
+    assert.equal(res.status, 400);
+    assert.equal((await res.json()).error.code, "VALIDATION_FAILED");
+  });
+});
+
+test("register with role caretaker -> 400 VALIDATION_FAILED (invite-only, not self-registerable)", async () => {
+  const app = buildAuthApp({
+    authenticate: createAuthenticate({ verifyIdToken, UserModel: fakeUserModel(null) }),
+    UserModel: fakeUserModel(null),
+  });
+  await withServer(app, async (base) => {
+    const res = await postRegister(base, { name: "Kavitha", role: "caretaker" });
+    assert.equal(res.status, 400);
+    assert.equal((await res.json()).error.code, "VALIDATION_FAILED");
+  });
+});
+
 test("register with role admin -> 403 FORBIDDEN", async () => {
   const app = buildAuthApp({
     authenticate: createAuthenticate({ verifyIdToken, UserModel: fakeUserModel(null) }),

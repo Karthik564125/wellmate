@@ -59,7 +59,7 @@ export function ElderDashboard() {
   // The first caretaker assigned to this elder.
   const caretaker = CARETAKERS.find((c) => c.assignedElderIds.includes(elder.id));
   // Family members linked to this elder, used as emergency contacts.
-  const contacts = FAMILY_MEMBERS.filter((m) => m.linkedElderId === elder.id);
+  const contacts = FAMILY_MEMBERS.filter((m) => m.elderId === elder.id);
   // Only appointments that have not happened yet.
   const upcoming = APPOINTMENTS.filter((a) => !a.past);
 
@@ -129,9 +129,9 @@ export function ElderDashboard() {
     <div className="senior-mode" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Greeting header: elder's avatar, name and today's date */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-        <Avatar name={elder.name} tone="teal" size="lg" />
+        <Avatar name={elder.displayName} tone="teal" size="lg" />
         <SectionHeader
-          title={`${t('dashboard.greeting')}, ${elder.name}`}
+          title={`${t('dashboard.greeting')}, ${elder.displayName}`}
           subtitle={`${todayText} · ${t('elder.pageSubtitle')}`}
         />
       </div>
@@ -201,7 +201,7 @@ export function ElderDashboard() {
                   <ul style={{ ...LIST_RESET, marginTop: '0.75rem' }}>
                     {slotMedicines.map((medicine) => (
                       <li key={medicine.id}>
-                        <strong>{medicine.name}</strong> — {medicine.dose}
+                        <strong>{medicine.name}</strong> — {medicine.dosage}
                       </li>
                     ))}
                   </ul>
