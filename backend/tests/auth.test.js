@@ -38,6 +38,15 @@ function fakeCareLink(links) {
   };
 }
 
+// Fake Elder model: findById by exact id match. Defaults to "no such elder"
+// so these CareLink-focused tests exercise the CareLink path, not the owner bypass
+// (see tests/elder.test.js for owner-bypass and route coverage).
+function fakeElderModel(elder = null) {
+  return {
+    findById: async (id) => (elder && String(elder._id) === String(id) ? elder : null),
+  };
+}
+
 // Build a small app with the real auth router and the real central error handler.
 function buildAuthApp(deps) {
   const app = express();
@@ -107,6 +116,7 @@ test("requireUser -> 401 UNAUTHENTICATED when req.user is null", () => {
 test("canAccessElder with no CareLink -> false", async () => {
   const result = await canAccessElder(USER_ID, ELDER_ID, "viewMedicines", {
     CareLink: fakeCareLink([]),
+    Elder: fakeElderModel(),
   });
   assert.equal(result, false);
 });
@@ -115,7 +125,10 @@ test("canAccessElder with revoked CareLink -> false", async () => {
   const CareLink = fakeCareLink([
     { elderId: ELDER_ID, userId: USER_ID, status: "revoked", permissions: ["viewMedicines"] },
   ]);
-  const result = await canAccessElder(USER_ID, ELDER_ID, "viewMedicines", { CareLink });
+  const result = await canAccessElder(USER_ID, ELDER_ID, "viewMedicines", {
+    CareLink,
+    Elder: fakeElderModel(),
+  });
   assert.equal(result, false);
 });
 
@@ -123,7 +136,10 @@ test("canAccessElder with active CareLink lacking the permission -> false", asyn
   const CareLink = fakeCareLink([
     { elderId: ELDER_ID, userId: USER_ID, status: "active", permissions: ["receiveAlerts"] },
   ]);
-  const result = await canAccessElder(USER_ID, ELDER_ID, "viewMedicines", { CareLink });
+  const result = await canAccessElder(USER_ID, ELDER_ID, "viewMedicines", {
+    CareLink,
+    Elder: fakeElderModel(),
+  });
   assert.equal(result, false);
 });
 
@@ -131,7 +147,30 @@ test("canAccessElder with active CareLink holding the permission -> true", async
   const CareLink = fakeCareLink([
     { elderId: ELDER_ID, userId: USER_ID, status: "active", permissions: ["viewMedicines"] },
   ]);
-  const result = await canAccessElder(USER_ID, ELDER_ID, "viewMedicines", { CareLink });
+  const result = await canAccessElder(USER_ID, ELDER_ID, "viewMedicines", {
+    CareLink,
+    Elder: fakeElderModel(),
+  });
+  assert.equal(result, true);
+});
+
+test("canAccessElder with no permission requested but an active CareLink -> true", async () => {
+  const CareLink = fakeCareLink([
+    { elderId: ELDER_ID, userId: USER_ID, status: "active", permissions: [] },
+  ]);
+  const result = await canAccessElder(USER_ID, ELDER_ID, null, {
+    CareLink,
+    Elder: fakeElderModel(),
+  });
+  assert.equal(result, true);
+});
+
+test("canAccessElder with no CareLink but matching Elder.userId (owner) -> true", async () => {
+  const elder = { _id: ELDER_ID, userId: USER_ID };
+  const result = await canAccessElder(USER_ID, ELDER_ID, "editProfile", {
+    CareLink: fakeCareLink([]),
+    Elder: fakeElderModel(elder),
+  });
   assert.equal(result, true);
 });
 

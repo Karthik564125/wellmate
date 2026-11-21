@@ -4,10 +4,26 @@
 
 import { Router } from "express";
 
+import careLinkRoutes from "./careLink.routes.js";
+import careRequestRoutes from "./careRequest.routes.js";
+import conditionRoutes from "./condition.routes.js";
+import doctorRoutes from "./doctor.routes.js";
+import elderRoutes from "./elder.routes.js";
+import emergencyContactRoutes from "./emergencyContact.routes.js";
 import healthRoutes from "./health.routes.js";
+import insuranceRoutes from "./insurance.routes.js";
+import medicineRoutes from "./medicine.routes.js";
 
 const router = Router();
 
 router.use(healthRoutes);
+router.use(elderRoutes);
+router.use(careLinkRoutes);
+router.use(careRequestRoutes);
+router.use(conditionRoutes);
+router.use(doctorRoutes);
+router.use(emergencyContactRoutes);
+router.use(insuranceRoutes);
+router.use(medicineRoutes);
 
 export default router;
