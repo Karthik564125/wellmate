@@ -86,7 +86,7 @@ export function createEmergencyContactRouter(deps = {}) {
       const contact = await ContactModel.findByIdAndUpdate(
         req.params.id,
         { $set: data },
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
       );
       res.json({ emergencyContact: toPublicEmergencyContact(contact) });
     }

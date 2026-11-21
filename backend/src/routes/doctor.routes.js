@@ -70,7 +70,7 @@ export function createDoctorRouter(deps = {}) {
       const doctor = await DoctorModel.findByIdAndUpdate(
         req.params.id,
         { $set: data },
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
       );
       res.json({ doctor: toPublicDoctor(doctor) });
     }

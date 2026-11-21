@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import './App.css';
 import App from './App.jsx';
+import { AuthProvider } from './auth/AuthContext.jsx';
 import { LanguageProvider } from './i18n/LanguageContext.jsx';
 import { RoleProvider } from './context/RoleContext.jsx';
 import { ToastProvider } from './components/ToastProvider.jsx';
@@ -13,13 +14,15 @@ import { ToastProvider } from './components/ToastProvider.jsx';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <LanguageProvider>
-        <RoleProvider>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
-        </RoleProvider>
-      </LanguageProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <RoleProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </RoleProvider>
+        </LanguageProvider>
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 );

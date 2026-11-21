@@ -80,7 +80,7 @@ export function createInsuranceRouter(deps = {}) {
       const policy = await InsuranceModel.findByIdAndUpdate(
         req.params.id,
         { $set: data },
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
       );
       res.json({ insurance: toPublicInsurance(policy) });
     }

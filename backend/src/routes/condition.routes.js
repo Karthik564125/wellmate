@@ -69,7 +69,7 @@ export function createConditionRouter(deps = {}) {
       const condition = await ConditionModel.findByIdAndUpdate(
         req.params.id,
         { $set: data },
-        { new: true, runValidators: true }
+        { returnDocument: "after", runValidators: true }
       );
       res.json({ condition: toPublicCondition(condition) });
     }
