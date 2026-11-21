@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Care Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f6;--card:#fff;--ink:#14262e;--mut:#5f737b;--line:#dde5e8;--brand:#1d5c73;--brand-s:#dfeef3;--warn:#a86a0c;--warn-s:#fbefd6;--bad:#b23f36;--bad-s:#f9e3e0;--ok:#2f7a57;--ok-s:#ddf0e6;--side:#14313d;--sideink:#c9dce3}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1a1f;--card:#16252c;--ink:#e6eff2;--mut:#93a8b0;--line:#26393f;--brand:#6bb6d0;--brand-s:#1c3a46;--warn:#e3a94b;--warn-s:#3a2d14;--bad:#ef8d84;--bad-s:#3d1f1c;--ok:#74c79d;--ok-s:#173226;--side:#0b1418}}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font:15px/1.5 Figtree,system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex}
+h1,h2,.serif{font-family:Newsreader,Georgia,serif;font-weight:600;letter-spacing:-.01em}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+aside{width:236px;background:var(--side);color:var(--sideink);padding:22px 14px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:10px;padding:0 10px 18px;color:#fff;font-family:Newsreader,serif;font-size:20px;font-weight:600}
+.logo i{width:30px;height:30px;border-radius:9px 9px 9px 3px;background:#6bb6d0;display:grid;place-items:center}
+aside a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;color:inherit;text-decoration:none;font-weight:500;cursor:pointer}
+aside a:hover{background:rgba(255,255,255,.07)}
+aside a.on{background:#fff;color:#14313d}
+aside a b{margin-left:auto;font-size:12px;background:var(--bad);color:#fff;border-radius:99px;padding:0 7px}
+aside a.on b{background:var(--bad)}
+.side-foot{margin-top:auto;font-size:12px;line-height:1.45;padding:12px;border-top:1px solid rgba(255,255,255,.12);color:#9db6bf}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:14px;padding:14px 32px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+.pt{display:flex;align-items:center;gap:12px}
+.pt small{display:block;color:var(--mut);font-size:13px;line-height:1.2}
+.pt strong{font-size:16px}
+.sp{flex:1}
+.role{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
+select{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 10px}
+.btn{border:0;background:var(--brand);color:#fff;padding:8px 14px;border-radius:9px;font-weight:600;cursor:pointer}
+html[data-t=dark] .btn{color:#0f1a1f}
+.btn.g{background:var(--brand-s);color:var(--brand)}
+.btn.sm{padding:4px 10px;font-size:13px;border-radius:7px}
+#view{padding:28px 32px 48px;max-width:1120px;width:100%}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0}
+.av.s{width:24px;height:24px;font-size:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h2{font-size:19px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h2 a{margin-left:auto;font:600 13px Figtree;color:var(--brand);cursor:pointer;text-decoration:none}
+.grid{display:grid;gap:18px}.g2{grid-template-columns:1.4fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1000px){.g2,.g3,.g4{grid-template-columns:1fr 1fr}}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--brand-s);color:var(--brand);white-space:nowrap}
+.pill.warn{background:var(--warn-s);color:var(--warn)}.pill.bad{background:var(--bad-s);color:var(--bad)}.pill.ok{background:var(--ok-s);color:var(--ok)}
+.mut{color:var(--mut);font-size:13px}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .grow{flex:1;min-width:0}
+.row .grow b{font-weight:600}
+.hero{padding:6px 0 26px}
+.hero h1{font-size:34px;line-height:1.2;max-width:760px}
+.hero h1 span{white-space:nowrap}
+.hero p{margin-top:10px;color:var(--mut)}
+.stat{border-left:4px solid var(--brand);cursor:pointer}
+.stat.w{border-color:var(--warn)}.stat.b{border-color:var(--bad)}.stat.o{border-color:var(--ok)}
+.stat .n{font:600 30px Newsreader,serif;line-height:1.1}
+.tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:var(--card);padding:6px 14px;border-radius:99px;cursor:pointer;font-weight:500}
+.tabs button.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.pg{display:flex;align-items:center;margin-bottom:20px;gap:14px;flex-wrap:wrap}
+.pg h1{font-size:28px}.pg p{color:var(--mut)}
+.tl{position:relative;padding-left:30px}
+.tl:before{content:"";position:absolute;left:11px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.ev{position:relative;padding:0 0 18px}
+.ev .dot{position:absolute;left:-30px;top:2px;width:24px;height:24px;border-radius:50%;background:var(--card);border:2px solid var(--brand);display:grid;place-items:center;color:var(--brand)}
+.ev .dot svg{width:12px;height:12px}
+.ev.fut .dot{border-style:dashed}
+.ev .mo{font-weight:600;font-size:13px;color:var(--mut)}
+.bar{height:7px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--ok);border-radius:9px}
+.bar.low i{background:var(--bad)}.bar.mid i{background:var(--warn)}
+.check{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);background:var(--card);cursor:pointer;display:grid;place-items:center;flex-shrink:0;color:#fff}
+.check.on{background:var(--ok);border-color:var(--ok)}
+.done b{text-decoration:line-through;color:var(--mut)}
+.lock{background:repeating-linear-gradient(135deg,var(--bg),var(--bg) 6px,var(--card) 6px,var(--card) 12px)}
+.col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.matrix{width:100%;border-collapse:collapse;font-size:14px}
+.matrix th,.matrix td{padding:10px 8px;border-top:1px solid var(--line);text-align:center}
+.matrix th:first-child,.matrix td:first-child{text-align:left}
+.matrix th{font-weight:600;color:var(--mut);font-size:13px;border:0}
+.yes{color:var(--ok);font-weight:700}.no{color:var(--line)}
+.note{background:var(--brand-s);color:var(--brand);border-radius:10px;padding:10px 14px;font-size:13px;margin-top:22px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 18px;border-radius:10px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+@media(max-width:820px){body{flex-direction:column}aside{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto;padding:10px}.logo,.side-foot{display:none}aside a{white-space:nowrap}header,#view{padding-left:16px;padding-right:16px}.g2,.g3,.g4,.col{grid-template-columns:1fr}.hero h1{font-size:26px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<aside id="nav" aria-label="Main"></aside>
+<main>
+<header>
+  <div class="pt"><div class="av" style="background:#8a5a7a;width:42px;height:42px;font-size:15px">LD</div><div><strong>Lakshmi Devi</strong><small>Age 72, lives in Hyderabad</small></div></div>
+  <div class="sp"></div>
+  <label class="role">Viewing as <select id="role" aria-label="Viewing as"></select></label>
+  <button class="btn" onclick="toast('Quick add opens here: task, update, record or appointment')">+ Add</button>
+</header>
+<div id="view"></div>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const P={ravi:['Ravi','Son, Hyderabad','#1d5c73','Admin'],anjali:['Anjali','Daughter, Bengaluru','#7a4f9c','Family'],suresh:['Suresh','Son, Delhi','#b0612b','Family'],meera:['Meera','Home caregiver','#2f7a57','Caregiver'],priya:['Priya','Granddaughter, Chennai','#a63d6b','Viewer']};
+const ROLES=['Admin','Family','Caregiver','Viewer'];
+let role='Admin',tab={};
+const IC={home:'M3 11l9-8 9 8M5 10v10h14V10',time:'M12 7v5l3 2M21 12a9 9 0 11-18 0 9 9 0 0118 0',file:'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6',pill:'M8 4l12 12a4 4 0 01-6 6L2 10a4 4 0 016-6zM9 11l5 5',cal:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',task:'M5 12l4 4 10-10',act:'M4 6h12M4 12h16M4 18h8',fam:'M16 11a3 3 0 100-6M8 11a3 3 0 100-6M2 20c0-3 3-5 6-5s6 2 6 5M16 15c3 0 6 2 6 5',lock:'M6 11h12v9H6zM8 11V8a4 4 0 018 0v3',plus:'M12 5v14M5 12h14'};
+const ic=k=>`<svg class="i" viewBox="0 0 24 24"><path d="${IC[k]}"/></svg>`;
+const av=(k,s)=>`<span class="av ${s?'s':''}" style="background:${P[k][2]}" title="${P[k][0]}">${P[k][0][0]}</span>`;
+const NAV=[['overview','Overview','home','ALL'],['timeline','Timeline','time','ALL'],['tasks','Tasks','task','Admin Family Caregiver'],['meds','Medicines & refills','pill','Admin Family Caregiver'],['appts','Appointments','cal','Admin Family Caregiver'],['records','Records','file','Admin Family'],['activity','Who did what','act','Admin Family'],['family','Family & access','fam','Admin']];
+const can=(a)=>a==='ALL'||a.split(' ').includes(role);
+const tasks=[
+{t:'Book cardiology follow-up for December',w:'anjali',d:'Nov 18',s:'over'},
+{t:'Pick up Metformin and Amlodipine refill',w:'ravi',d:'Nov 22',s:'open'},
+{t:'Collect blood test report from lab',w:'meera',d:'Nov 21',s:'open'},
+{t:'Upload last month’s discharge summary',w:'suresh',d:'Nov 25',s:'open'},
+{t:'Arrange cab for Tuesday eye check-up',w:'ravi',d:'Nov 24',s:'open'},
+{t:'Renew health insurance policy',w:'suresh',d:'Nov 12',s:'done'},
+{t:'Share new prescription photo',w:'meera',d:'Nov 14',s:'done'},
+{t:'Order glucometer strips',w:'anjali',d:'Nov 10',s:'done'}];
+const meds=[
+{n:'Metformin 500 mg',s:'Morning and night, after food',left:4,tot:30,by:'Nov 25',w:'ravi'},
+{n:'Amlodipine 5 mg',s:'Once daily, morning',left:9,tot:30,by:'Nov 30',w:'ravi'},
+{n:'Vitamin D3 60k IU',s:'Once a week, Sunday',left:3,tot:8,by:'Dec 14',w:'anjali'},
+{n:'Calcium 500 mg',s:'Once daily, night',left:21,tot:30,by:'Dec 12',w:'meera'}];
+const appts=[
+{d:'Nov 24',m:'Tue',t:'Eye check-up',dr:'Dr. Sharma, Sunrise Eye Clinic',tm:'10:30 am',w:'ravi',c:'Cab booked'},
+{d:'Dec 03',m:'Wed',t:'Cardiology follow-up',dr:'Dr. Rao, City Heart Centre',tm:'Time not fixed',w:'',c:'Not booked yet'},
+{d:'Dec 10',m:'Wed',t:'Diabetes review and HbA1c',dr:'Dr. Iyer, Care Hospital',tm:'9:00 am',w:'anjali',c:'Booked'}];
+const past=[{d:'Nov 05',t:'Physician visit',dr:'Dr. Iyer',w:'ravi'},{d:'Oct 19',t:'Dental cleaning',dr:'Smile Dental',w:'meera'}];
+const recs=[
+{n:'HbA1c and lipid panel',k:'Lab report',d:'Nov 03',by:'suresh',v:'Family'},
+{n:'Discharge summary, Oct stay',k:'Report',d:'Oct 14',by:'ravi',v:'Family'},
+{n:'Prescription, Dr. Iyer',k:'Prescription',d:'Nov 05',by:'meera',v:'Family'},
+{n:'ECG report',k:'Lab report',d:'Sep 28',by:'anjali',v:'Family'},
+{n:'Insurance policy and claim papers',k:'Insurance',d:'Nov 12',by:'suresh',v:'Admin'},
+{n:'Power of attorney copy',k:'Legal',d:'Jun 02',by:'ravi',v:'Admin'}];
+const feed=[
+['suresh','renewed the health insurance policy','Nov 12, 6:40 pm'],
+['meera','uploaded the new prescription photo','Nov 14, 11:05 am'],
+['ravi','marked the physician visit as completed','Nov 05, 1:15 pm'],
+['anjali','ordered glucometer strips','Nov 10, 9:20 am'],
+['suresh','added the HbA1c lab report','Nov 03, 4:30 pm']];
+const days=n=>n<=5?'bad':n<=10?'warn':'ok';
+
+function go(id){if(!NAV.find(n=>n[0]===id&&can(n[3])))id='overview';location.hash=id;render()}
+function render(){
+ const id=(location.hash||'#overview').slice(1);
+ const cur=NAV.find(n=>n[0]===id&&can(n[3]))?id:'overview';
+ const od=tasks.filter(t=>t.s==='over').length;
+ nav.innerHTML=`<div class="logo"><i>${ic('fam').replace('class="i"','class="i" style="stroke:#14313d"')}</i>Family Care Hub</div>`+
+ NAV.filter(n=>can(n[3])).map(n=>`<a class="${n[0]===cur?'on':''}" onclick="go('${n[0]}')" tabindex="0">${ic(n[2])}${n[1]}${n[0]==='tasks'&&od?`<b>${od}</b>`:''}</a>`).join('')+
+ `<div class="side-foot">Organises information only. It does not give medical advice. Doctors make all clinical decisions. Sample data.</div>`;
+ view.innerHTML=S[cur]();window.scrollTo(0,0)}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2200)}
+function tabs(k,opts){return`<div class="tabs">${opts.map(o=>`<button class="${(tab[k]||opts[0])===o?'on':''}" onclick="tab['${k}']='${o}';render()">${o}</button>`).join('')}</div>`}
+const head=(t,p,b)=>`<div class="pg"><div><h1>${t}</h1><p>${p}</p></div><div class="sp"></div>${b?`<button class="btn" onclick="toast('${b[1]}')">${b[0]}</button>`:''}</div>`;
+const trow=t=>`<div class="row ${t.s==='done'?'done':''}"><span class="check ${t.s==='done'?'on':''}" onclick="toast('${t.s==='done'?'Reopened':'Marked done by '+P[role==='Admin'?'ravi':'anjali'][0]}')">${t.s==='done'?'&#10003;':''}</span><div class="grow"><b>${t.t}</b><div class="mut">Due ${t.d}</div></div>${t.s==='over'?'<span class="pill bad">Overdue</span>':''}${av(t.w,1)}<span class="mut">${P[t.w][0]}</span></div>`;
+
+const S={
+overview(){
+ const pend=tasks.filter(t=>t.s!=='done'),low=meds.filter(m=>m.left<=5);
+ const v=role==='Viewer';
+ return`<div class="hero"><h1>${v?'Lakshmi’s next appointment is <span>Tuesday, Nov 24</span>.':'One refill runs out <span>this week</span>, one task is overdue, and the next visit is <span>Tuesday</span>.'}</h1><p>Updated today at 9:40 am by Meera. You are viewing as ${role}.</p></div>
+ ${v?'':`<div class="grid g4" style="margin-bottom:18px">
+  <div class="card stat b" onclick="go('tasks')"><div class="n">1</div>Overdue task<div class="mut">Cardiology booking</div></div>
+  <div class="card stat w" onclick="go('meds')"><div class="n">${low.length}</div>Refill due soon<div class="mut">Metformin in 4 days</div></div>
+  <div class="card stat" onclick="go('appts')"><div class="n">3</div>Upcoming visits<div class="mut">Next: Nov 24</div></div>
+  <div class="card stat o" onclick="go('activity')"><div class="n">3</div>Done this month<div class="mut">of 8 tasks</div></div></div>`}
+ <div class="grid ${v?'':'g2'}">
+  <div class="card"><h2>Coming up<a onclick="go('timeline')">Full timeline</a></h2>
+   ${appts.map(a=>`<div class="row"><div style="text-align:center;min-width:48px"><div class="serif" style="font-size:22px;line-height:1">${a.d.slice(4)}</div><div class="mut">${a.d.slice(0,3)}</div></div><div class="grow"><b>${a.t}</b><div class="mut">${a.dr}</div></div>${a.w?`${av(a.w,1)}`:'<span class="pill warn">Needs someone</span>'}</div>`).join('')}</div>
+  ${v?'':`<div class="card"><h2>Needs attention</h2>
+   ${pend.slice(0,1).map(t=>trow(t)).join('')}
+   ${low.map(m=>`<div class="row"><div class="grow"><b>${m.n}</b><div class="mut">${m.left} days left, refill by ${m.by}</div></div><span class="pill ${days(m.left)}">${m.left} days</span></div>`).join('')}
+   <div class="row"><div class="grow"><b>Cardiology visit has no slot</b><div class="mut">Suggested by Dec 03</div></div><span class="pill warn">Unbooked</span></div></div>`}
+ </div>
+ ${v?'':`<div class="grid g2" style="margin-top:18px">
+  <div class="card"><h2>Latest updates<a onclick="go('activity')">See all</a></h2>${feed.slice(0,4).map(f=>`<div class="row">${av(f[0],1)}<div class="grow"><b>${P[f[0]][0]}</b> ${f[1]}</div><span class="mut">${f[2].split(',')[0]}</span></div>`).join('')}</div>
+  <div class="card"><h2>Who has what</h2>${Object.keys(P).slice(0,4).map(k=>{const n=pend.filter(t=>t.w===k).length;return`<div class="row">${av(k,1)}<div class="grow"><b>${P[k][0]}</b><div class="mut">${P[k][1]}</div></div><span class="pill ${n>2?'warn':''}">${n} open</span></div>`}).join('')}</div></div>`}`},
+
+timeline(){
+ const ev=[['Nov 24','Eye check-up with Dr. Sharma','cal',1],['Nov 25','Metformin refill needed','pill',1],['Nov 21','Blood test report to collect','file',1],['Nov 05','Physician visit completed','cal'],['Nov 05','New prescription added','pill'],['Nov 03','HbA1c lab report added','file'],['Oct 19','Dental cleaning completed','cal'],['Oct 14','Discharge summary added','file']];
+ const f=tab.tl||'All';
+ const map={Appointments:'cal',Prescriptions:'pill',Reports:'file'};
+ const list=ev.filter(e=>f==='All'||e[2]===map[f]);
+ const lim=role==='Caregiver'||role==='Viewer';
+ return head('Timeline','Every appointment, prescription and report in one order.')+tabs('tl',['All','Appointments','Prescriptions','Reports'])+
+ `<div class="card"><div class="tl">${list.filter(e=>!(lim&&e[2]==='file')).map(e=>`<div class="ev ${e[3]?'fut':''}"><span class="dot">${ic(e[2])}</span><div class="mo">${e[0]}${e[3]?' (upcoming)':''}</div><b>${e[1]}</b></div>`).join('')}</div></div>`+
+ (lim?'<div class="note">Reports are hidden for your role. Ask an admin if you need access.</div>':'')},
+
+tasks(){
+ const f=tab.tk||'Open';
+ const list=tasks.filter(t=>f==='Open'?t.s!=='done':f==='Done'?t.s==='done':true);
+ return head('Tasks','Assigned to one person, with a due date, so nothing is left to chance.',['+ New task','Task form opens here'])+tabs('tk',['Open','Done','All'])+
+ `<div class="grid g2"><div class="card">${list.map(trow).join('')||'<p class="mut">Nothing here. Add a task to get started.</p>'}</div>
+ <div class="card"><h2>Reminders</h2>${[['Tomorrow, 8:00 am','Lab report collection, Meera'],['Nov 22, 9:00 am','Medicine pickup, Ravi'],['Nov 23, 6:00 pm','Cab for Tuesday visit, Ravi']].map(r=>`<div class="row"><div class="grow"><b>${r[1]}</b><div class="mut">${r[0]}</div></div><button class="btn g sm" onclick="toast('Reminder snoozed')">Snooze</button></div>`).join('')}</div></div>`},
+
+meds(){
+ return head('Medicines & refills','Track supply and who is picking up the next refill. Doses come from the doctor’s prescription.',['+ Add medicine','Add medicine form opens here'])+
+ `<div class="grid g2">${meds.sort((a,b)=>a.left-b.left).map(m=>`<div class="card"><div style="display:flex;gap:10px;align-items:start"><div class="grow" style="flex:1"><h2 style="margin:0">${m.n}</h2><div class="mut">${m.s}</div></div><span class="pill ${days(m.left)}">${m.left} days left</span></div>
+ <div class="bar ${m.left<=5?'low':m.left<=10?'mid':''}"><i style="width:${Math.round(m.left/m.tot*100)}%"></i></div>
+ <div class="row" style="border:0;margin-top:8px;padding-bottom:0">${av(m.w,1)}<div class="grow mut">${P[m.w][0]} will refill by ${m.by}</div><button class="btn g sm" onclick="toast('Marked as refilled')">Mark refilled</button></div></div>`).join('')}</div>
+ <div class="note">Prescriptions are copied exactly as written by the doctor. Questions about dose or changes go to the doctor.</div>`},
+
+appts(){
+ return head('Appointments','See who is taking Amma and what is still unbooked.',['+ Book appointment','Appointment form opens here'])+
+ `<div class="grid g2"><div class="card"><h2>Upcoming</h2>${appts.map(a=>`<div class="row"><div style="text-align:center;min-width:52px;background:var(--brand-s);border-radius:10px;padding:6px 0"><div class="serif" style="font-size:22px;line-height:1">${a.d.slice(4)}</div><div class="mut">${a.m}</div></div><div class="grow"><b>${a.t}</b><div class="mut">${a.dr}, ${a.tm}</div></div><div style="text-align:right">${a.w?`<div style="display:flex;gap:6px;align-items:center;justify-content:flex-end">${av(a.w,1)}<span class="mut">${P[a.w][0]}</span></div>`:'<button class="btn sm" onclick="toast(\'You are now taking Amma\')">I can take her</button>'}<span class="pill ${a.c==='Not booked yet'?'warn':'ok'}" style="margin-top:4px">${a.c}</span></div></div>`).join('')}</div>
+ <div class="card"><h2>Past visits</h2>${past.map(a=>`<div class="row"><div class="grow"><b>${a.t}</b><div class="mut">${a.d}, ${a.dr}</div></div>${av(a.w,1)}<span class="pill ok">Completed</span></div>`).join('')}</div></div>`},
+
+records(){
+ const f=tab.rc||'All';
+ const list=recs.filter(r=>f==='All'||r.k===f);
+ return head('Records','Reports, prescriptions and papers, shared with the right people only.',['+ Upload record','Upload dialog opens here'])+tabs('rc',['All','Lab report','Report','Prescription','Insurance','Legal'])+
+ `<div class="card">${list.map(r=>{const locked=r.v==='Admin'&&role!=='Admin';return`<div class="row ${locked?'lock':''}"><span style="color:var(--brand)">${ic(locked?'lock':'file')}</span><div class="grow"><b>${locked?'Restricted record':r.n}</b><div class="mut">${r.k}, added ${r.d} by ${P[r.by][0]}</div></div><span class="pill ${r.v==='Admin'?'warn':''}">${r.v==='Admin'?'Admin only':'Family'}</span>${locked?'':'<button class="btn g sm" onclick="toast(\'Opening sample file\')">Open</button>'}</div>`}).join('')}</div>
+ <div class="note">Sample files only. No real patient records are stored in this demo.</div>`},
+
+activity(){
+ const pend=tasks.filter(t=>t.s!=='done'),dn=tasks.filter(t=>t.s==='done');
+ return head('Who did what','The full picture of what is done and what is still waiting.')+
+ `<div class="col"><div class="card"><h2><span class="pill ok">Done</span> ${dn.length} items</h2>${feed.map(f=>`<div class="row">${av(f[0],1)}<div class="grow"><b>${P[f[0]][0]}</b> ${f[1]}<div class="mut">${f[2]}</div></div></div>`).join('')}</div>
+ <div class="card"><h2><span class="pill warn">Pending</span> ${pend.length} items</h2>${pend.map(t=>`<div class="row">${av(t.w,1)}<div class="grow"><b>${t.t}</b><div class="mut">${P[t.w][0]}, due ${t.d}</div></div>${t.s==='over'?'<span class="pill bad">Overdue</span>':''}<button class="btn g sm" onclick="toast('Nudge sent to ${P[t.w][0]}')">Nudge</button></div>`).join('')}</div></div>`},
+
+family(){
+ const rows=[['See overview and timeline',1,1,1,1],['Tasks, medicines and appointments',1,1,1,0],['View family records',1,1,0,0],['View restricted records',1,0,0,0],['Invite or remove people',1,0,0,0]];
+ return head('Family & access','Choose what each person can see.',['+ Invite someone','Invite link created'])+
+ `<div class="grid g2"><div class="card"><h2>Members</h2>${Object.keys(P).map(k=>`<div class="row">${av(k)}<div class="grow"><b>${P[k][0]}</b><div class="mut">${P[k][1]}</div></div><select aria-label="Role for ${P[k][0]}">${ROLES.map(r=>`<option ${r===P[k][3]?'selected':''}>${r}</option>`).join('')}</select></div>`).join('')}</div>
+ <div class="card"><h2>What each role can do</h2><table class="matrix"><tr><th></th>${ROLES.map(r=>`<th>${r}</th>`).join('')}</tr>${rows.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map(x=>`<td class="${x?'yes':'no'}">${x?'&#10003;':'&ndash;'}</td>`).join('')}</tr>`).join('')}</table></div></div>
+ <div class="note">Health information is shared on a need-to-see basis. Every change is logged in Who did what.</div>`}
+};
+const rs=document.getElementById('role');rs.innerHTML=ROLES.map(r=>`<option>${r}</option>`).join('');
+rs.onchange=e=>{role=e.target.value;render()};
+addEventListener('hashchange',render);
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('aside a'))e.target.click()});
+render();
+</script>
+</body>
+</html>
