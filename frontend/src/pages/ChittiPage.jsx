@@ -19,6 +19,7 @@ import { Card } from '../components/Card.jsx';
 import { Badge } from '../components/Badge.jsx';
 import { Modal } from '../components/Modal.jsx';
 import { SectionHeader } from '../components/SectionHeader.jsx';
+import SarvamCall from '../components/SarvamCall.jsx';
 import { api, ApiError } from '../api/client.js';
 import { confirm as confirmTurn, getConversation, turn } from '../api/assistant.js';
 import { ELDERLY_PEOPLE } from '../data/mockData.js';
@@ -63,12 +64,15 @@ export function ChittiPage() {
   const { show } = useToast();
   const { triggerAlert } = useEmergencyAlert();
 
-  // No real signed-in account: run the fully offline demo engine instead of
-  // calling the backend. See the file header comment for why.
-  const demoMode = !authLoading && !user;
-
   const [elderId, setElderId] = useState(null);
   const [resolvingElder, setResolvingElder] = useState(true);
+
+  // Demo mode: either no Firebase user at all, OR a Firebase user exists but
+  // the backend returned no elder linked to them (e.g. demo role-select
+  // session where sign-in was done but no elder profile was created yet).
+  // In both cases we fall back to the fully offline scripted demo engine so
+  // the Chitti voice feature stays demonstrable without a real elder record.
+  const demoMode = !authLoading && (!user || (!resolvingElder && !elderId));
 
   const [phase, setPhase] = useState('idle');
   const [transcript, setTranscript] = useState('');
@@ -454,6 +458,8 @@ export function ChittiPage() {
           </div>
         )}
       </Card>
+
+      <SarvamCall />
 
       <Modal open={!consentGiven} title={t('chitti.consentTitle')} onClose={() => {}}>
         <p>{t('chitti.consentBody')}</p>

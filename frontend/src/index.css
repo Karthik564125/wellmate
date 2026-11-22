@@ -1888,6 +1888,24 @@ textarea {
   gap: 24px;
 }
 
+/* ============================================================
+   Sarvam Call — demo mode info banner
+   ============================================================ */
+
+/* Flex row: mic emoji + text, matching the card's existing padding */
+.sarvam-demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.sarvam-demo-banner__icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
 /* ---------- Chitti voice assistant ---------- */
 .chitti-disclaimer {
   background: var(--warn-s);
@@ -1904,6 +1922,38 @@ textarea {
   gap: 12px;
   padding: 24px 0;
 }
+
+/* "Call Chitti" card (SarvamCall.jsx): sits under the mic card, kept compact. */
+.sarvam-call {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.sarvam-call__title {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: var(--ink);
+}
+
+.sarvam-call__button {
+  width: 100%;
+}
+
+.sarvam-call__message {
+  margin: 12px 0 0;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.sarvam-call__hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink);
+  opacity: 0.8;
+}
+
 
 .chitti-mic-button {
   display: flex;
