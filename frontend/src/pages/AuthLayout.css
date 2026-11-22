@@ -161,26 +161,30 @@
 }
 
 .auth-page .field-password input {
-  padding-right: 110px;
+  padding-right: 48px;
 }
 
 .auth-page .field-toggle {
   position: absolute;
-  right: 6px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
   background: none;
   border: 0;
-  border-radius: 999px;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--lp-plum);
+  border-radius: 6px;
+  color: var(--lp-mut);
   cursor: pointer;
+  transition: color 0.15s, background 0.15s;
 }
 
 .auth-page .field-toggle:hover {
+  color: var(--lp-plum);
   background: var(--lp-pink);
 }
 
@@ -344,7 +348,7 @@
   }
 
   .auth-page .field-password input {
-    padding-right: 96px;
+    padding-right: 48px;
   }
 }
 
