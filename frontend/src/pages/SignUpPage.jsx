@@ -13,11 +13,11 @@ import { ApiError, api } from '../api/client.js';
 import { RoleSelect } from '../components/RoleSelect.jsx';
 import { SELF_REGISTERABLE_ROLES } from '../data/mockData.js';
 import { AuthLayout } from './AuthLayout.jsx';
+import familyPhoto from '../assets/11.png';
 
 // Simple email shape check: something@something.tld with no spaces.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-// Phone check: optional leading +, then 7 to 15 digits, spaces or dashes.
-const PHONE_PATTERN = /^\+?[0-9][0-9\s-]{6,14}$/;
+
 // Minimum password length Firebase (and this form) accepts.
 const MIN_PASSWORD_LENGTH = 6;
 
@@ -38,7 +38,6 @@ export function SignUpPage() {
   const [form, setForm] = useState({
     name: '',
     email: '',
-    phone: '',
     password: '',
     confirmPassword: '',
     role: initialSelfRegisterRole(role),
@@ -58,7 +57,7 @@ export function SignUpPage() {
     if (!form.name.trim()) next.name = t('auth.validation.nameRequired');
     if (!form.email.trim()) next.email = t('auth.validation.emailRequired');
     else if (!EMAIL_PATTERN.test(form.email.trim())) next.email = t('auth.validation.emailInvalid');
-    if (form.phone.trim() && !PHONE_PATTERN.test(form.phone.trim())) next.phone = t('auth.validation.phoneInvalid');
+
     if (!form.password) next.password = t('auth.validation.passwordRequired');
     else if (form.password.length < MIN_PASSWORD_LENGTH) next.password = t('auth.validation.passwordTooShort');
     if (form.confirmPassword !== form.password) next.confirmPassword = t('auth.validation.passwordMismatch');
@@ -80,7 +79,7 @@ export function SignUpPage() {
       const { user } = await api.post('/auth/register', {
         name: form.name.trim(),
         role: form.role,
-        phone: form.phone.trim() || undefined,
+
         email: form.email.trim(),
       });
       setRole(user.role);
@@ -127,6 +126,8 @@ export function SignUpPage() {
     <AuthLayout
       title={t('auth.signUpTitle')}
       subtitle={t('auth.signUpSubtitle')}
+      image={familyPhoto}
+      imageAlt={t('auth.imageAlt.signUp')}
       footer={
         <p>
           {t('auth.haveAccount')} <Link to="/signin">{t('auth.signIn')}</Link>
@@ -136,7 +137,7 @@ export function SignUpPage() {
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
         {renderInput('name', t('auth.name'), 'text', 'name')}
         {renderInput('email', t('auth.email'), 'email', 'email')}
-        {renderInput('phone', t('auth.phone'), 'tel', 'tel')}
+
         {renderInput('password', t('auth.password'), 'password', 'new-password')}
         {renderInput('confirmPassword', t('auth.confirmPassword'), 'password', 'new-password')}
 
