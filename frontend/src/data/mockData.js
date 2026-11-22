@@ -18,6 +18,8 @@ export const ROLES = [
 export const SELF_REGISTERABLE_ROLES = [
   { id: 'elder', labelKey: 'roles.elder' },
   { id: 'family', labelKey: 'roles.family' },
+  { id: 'volunteer', labelKey: 'roles.volunteer' },
+  { id: 'caretaker', labelKey: 'roles.caretaker' },
 ];
 
 // Elderly people being cared for; status flags whether they currently need assistance.

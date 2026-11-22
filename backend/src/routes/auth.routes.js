@@ -14,7 +14,7 @@ const registerSchema = z.object({
   // the role from the invite (see careLink.routes.js). "admin" is in the
   // enum so the request reaches the explicit 403 check below instead of
   // failing validation with a less clear message.
-  role: z.enum(["elder", "family", "admin"]),
+  role: z.enum(["elder", "family", "volunteer", "caretaker"]),
   preferredLanguage: z.enum(["te", "en"]).optional(),
   phone: z.string().optional(),
   // Lowercased/trimmed so later email-based lookups (e.g. connecting an

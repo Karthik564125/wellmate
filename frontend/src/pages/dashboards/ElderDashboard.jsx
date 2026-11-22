@@ -11,6 +11,7 @@ import { useEmergencyAlert } from '../../context/EmergencyAlertContext.jsx';
 import { useCareRequests } from '../../context/CareRequestContext.jsx';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
 import { listDemoAppointments } from '../../api/appointments.js';
+import { useMyProfile, isFreshAccount, FreshAccountView } from '../../components/FreshAccountView.jsx';
 import {
   ELDERLY_PEOPLE,
   MEDICINES,
@@ -76,6 +77,8 @@ export function ElderDashboard() {
   // Nearby care requests a volunteer has responded to (e.g. "available to bring sugar tablets").
   const { requests: careRequests } = useCareRequests();
   const volunteerUpdates = careRequests.filter((request) => request.status === 'responded');
+  // Signed-in profile from GET /me: a brand-new elder account gets an empty dashboard instead of the demo data.
+  const { loading, profile } = useMyProfile();
 
   // The logged-in elder for this demo.
   const elder = ELDERLY_PEOPLE[0];
@@ -169,6 +172,20 @@ export function ElderDashboard() {
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
+
+  // Still loading the signed-in profile: show a short message instead of any dashboard data.
+  if (loading) {
+    return (
+      <div className="senior-mode" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <p>Loading your dashboard…</p>
+      </div>
+    );
+  }
+
+  // New Elder account with no family links yet: an empty dashboard with no demo data.
+  if (isFreshAccount(profile, 'elder')) {
+    return <FreshAccountView name={profile.user?.name || profile.user?.email} role="elder" />;
+  }
 
   return (
     <div className="senior-mode" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

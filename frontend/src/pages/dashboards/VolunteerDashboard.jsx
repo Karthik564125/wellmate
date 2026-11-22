@@ -11,6 +11,7 @@ import { SectionHeader } from '../../components/SectionHeader.jsx';
 import { EmptyState } from '../../components/EmptyState.jsx';
 import { useToast } from '../../components/ToastProvider.jsx';
 import { useCareRequests } from '../../context/CareRequestContext.jsx';
+import { useMyProfile, isFreshAccount, FreshAccountView } from '../../components/FreshAccountView.jsx';
 import { ELDERLY_PEOPLE, VOLUNTEERS, HELP_REQUESTS } from '../../data/mockData.js';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
 
@@ -89,6 +90,9 @@ export function VolunteerDashboard() {
   const showRequests = pathname.endsWith('/requests');
   const showElders = pathname.endsWith('/elders');
   const showOverview = !showRequests && !showElders;
+  // Signed-in profile from GET /me: a brand-new volunteer account gets an empty dashboard instead of the demo data.
+  const { loading, profile } = useMyProfile();
+
 
   // Help requests with live status (open, accepted, declined, completed), seeded from mock data.
   const [requests, setRequests] = useState(() => HELP_REQUESTS.map((request) => ({ ...request })));
@@ -181,7 +185,7 @@ export function VolunteerDashboard() {
         el.scrollIntoView({ behavior: 'smooth' });
       }
     }
-  }, []);
+  }, [loading]);
 
   // Summary tiles across the top of the page.
   const stats = [
@@ -196,6 +200,20 @@ export function VolunteerDashboard() {
     { id: 'assigned', label: t('volunteer.tabAssigned') },
     { id: 'completed', label: t('volunteer.tabCompleted') },
   ];
+
+  // Still loading the signed-in profile: show a short message instead of any dashboard data.
+  if (loading) {
+    return (
+      <div style={{ display: 'grid', gap: '1.5rem' }}>
+        <p>Loading your dashboard…</p>
+      </div>
+    );
+  }
+
+  // New Volunteer account with no links yet: an empty dashboard with no demo data.
+  if (isFreshAccount(profile, 'volunteer')) {
+    return <FreshAccountView name={profile.user?.name || profile.user?.email} role="volunteer" />;
+  }
 
   return (
     <div style={{ display: 'grid', gap: '1.5rem' }}>

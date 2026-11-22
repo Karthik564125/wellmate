@@ -6,6 +6,7 @@ import { useTranslation } from '../i18n/LanguageContext.jsx';
 import { LanguageSwitcher } from './LanguageSwitcher.jsx';
 import { RoleSelect } from './RoleSelect.jsx';
 import { useToast } from './ToastProvider.jsx';
+import { useMyProfile } from './FreshAccountView.jsx';
 
 // Per-role metadata: name shown in the header, subtitle line, avatar initials and avatar background colour.
 // This map keeps all role-specific UI strings in one place so the topbar renders dynamically for every role.
@@ -57,6 +58,9 @@ export function Topbar() {
   // even when a real account happens to be signed in - the role switcher should
   // always be the source of truth for what's displayed here.
   const profile = ROLE_PROFILES[role] ?? ROLE_PROFILES.elder;
+  // Signed-in account from GET /me: when its role matches the active role, show the account's own name.
+  const { profile: myProfile } = useMyProfile();
+  const displayName = myProfile?.user?.name && myProfile.user.role === role ? myProfile.user.name : profile.name;
 
   // Demo mode just navigates home (there's no real session to end); a real
   // account also actually signs out of Firebase, not just navigates away.
@@ -88,7 +92,7 @@ export function Topbar() {
           {profile.initials}
         </div>
         <div>
-          <strong>{profile.name}</strong>
+          <strong>{displayName}</strong>
           <small>{profile.subtitle}</small>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { SectionHeader } from '../../components/SectionHeader.jsx';
 import { Modal } from '../../components/Modal.jsx';
 import { useToast } from '../../components/ToastProvider.jsx';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
+import { useMyProfile, isFreshAccount, FreshAccountView } from '../../components/FreshAccountView.jsx';
 import {
   CARETAKERS,
   ELDERLY_PEOPLE,
@@ -61,6 +62,8 @@ export function CaretakerDashboard() {
   const { t } = useTranslation();
   // Toast helper used to confirm actions.
   const { show } = useToast();
+  // Signed-in profile from GET /me: a brand-new caretaker account gets an empty dashboard instead of the demo data.
+  const { loading, profile } = useMyProfile();
 
   // Which tab is currently visible: today, elders or appointments.
   const [activeTab, setActiveTab] = useState('today');
@@ -128,6 +131,20 @@ export function CaretakerDashboard() {
 
   // The elder currently shown in the care plan modal, looked up from the assigned list.
   const carePlanElder = assignedElders.find((elder) => elder.id === carePlanElderId) ?? null;
+
+  // Still loading the signed-in profile: show a short message instead of any dashboard data.
+  if (loading) {
+    return (
+      <div className="caretaker-dashboard">
+        <p>Loading your dashboard…</p>
+      </div>
+    );
+  }
+
+  // New Caretaker account with no assignments yet: an empty dashboard with no demo data.
+  if (isFreshAccount(profile, 'caretaker')) {
+    return <FreshAccountView name={profile.user?.name || profile.user?.email} role="caretaker" />;
+  }
 
   return (
     <div className="caretaker-dashboard">

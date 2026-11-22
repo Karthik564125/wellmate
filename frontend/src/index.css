@@ -3566,7 +3566,7 @@ time,
 
 /* ---------- Links: brand-tinted in content (not the sidebar) ---------- */
 .card a:not(.btn),
-.hero a,
+.hero a:not(.btn),
 .note a {
   color: var(--brand);
   text-decoration-color: color-mix(in srgb, var(--brand) 40%, transparent);

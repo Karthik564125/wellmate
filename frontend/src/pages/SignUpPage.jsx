@@ -141,7 +141,6 @@ export function SignUpPage() {
         {renderInput('password', t('auth.password'), 'password', 'new-password')}
         {renderInput('confirmPassword', t('auth.confirmPassword'), 'password', 'new-password')}
 
-        {/* Only elder/family here: volunteer/caretaker are invite-only. */}
         <label className="field">
           <span>{t('auth.role')}</span>
           <RoleSelect
@@ -149,9 +148,6 @@ export function SignUpPage() {
             onChange={(value) => updateField('role', value)}
             roles={SELF_REGISTERABLE_ROLES}
           />
-          <span className="auth-demo-note" style={{ marginTop: 8 }}>
-            {t('auth.selfRegisterRoleHint')}
-          </span>
           {errors.role && <span className="field-error" role="alert">{errors.role}</span>}
         </label>
 

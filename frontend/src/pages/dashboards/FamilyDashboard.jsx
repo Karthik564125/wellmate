@@ -14,6 +14,8 @@ import { useEmergencyAlert } from '../../context/EmergencyAlertContext.jsx';
 import { useCareRequests } from '../../context/CareRequestContext.jsx';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
 import { listDemoAppointments, updateDemoAppointment } from '../../api/appointments.js';
+import { api } from '../../api/client.js';
+
 import {
   ELDERLY_PEOPLE,
   FAMILY_MEMBERS,
@@ -148,6 +150,27 @@ export function FamilyDashboard() {
   const volunteerUpdates = careRequests.filter((request) => request.status === 'responded');
   // Help requests have their own sub-route (/dashboard/family/requests); there this page shows only the help card.
   const showRequests = useLocation().pathname.endsWith('/requests');
+  // Signed-in profile from GET /me, loaded once. Decides whether this is a new Family account with no elder linked.
+  const [profileState, setProfileState] = useState({ loading: true, profile: null });
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .get('/me')
+      .then((profile) => {
+        if (!cancelled) setProfileState({ loading: false, profile });
+      })
+      .catch(() => {
+        if (!cancelled) setProfileState({ loading: false, profile: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const profile = profileState.profile;
+  const isNewFamilyAccount = Boolean(
+    profile && profile.user?.role === 'family' && !profile.ownElderId && (profile.carelinks?.length ?? 0) === 0,
+  );
+
 
   // The parent this family member looks after.
   const elder = ELDERLY_PEOPLE[0];
@@ -313,6 +336,48 @@ export function FamilyDashboard() {
   function toggleTask(taskId) {
     setTasks((previous) => previous.map((task) => (task.id === taskId ? { ...task, done: !task.done } : task)));
   }
+
+  // Still loading the signed-in profile: show a short message instead of any dashboard data.
+  if (profileState.loading) {
+    return (
+      <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <p>Loading your dashboard…</p>
+      </div>
+    );
+  }
+
+  // New Family account with no elder linked yet: an empty dashboard with no demo data.
+  if (isNewFamilyAccount) {
+    const displayName = profile.user?.name || profile.user?.email || '';
+    return (
+      <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div className="hero">
+          <h1>Welcome, {displayName}</h1>
+          <p>You have not added an elder yet. Add the elder you care for to start.</p>
+          <div style={{ ...BUTTON_ROW, marginTop: '1rem' }}>
+            <Link to="/add-family-member" className="btn btn-primary">
+              Add an elder
+            </Link>
+          </div>
+        </div>
+        <div style={AUTO_GRID}>
+          <Card title="Medicines">
+            <p>Nothing added yet.</p>
+          </Card>
+          <Card title="Appointments">
+            <p>Nothing added yet.</p>
+          </Card>
+          <Card title="Insurance">
+            <p>Nothing added yet.</p>
+          </Card>
+          <Card title="Family members">
+            <p>Nothing added yet.</p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
