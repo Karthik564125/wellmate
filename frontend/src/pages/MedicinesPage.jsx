@@ -81,7 +81,7 @@ export function MedicinesPage() {
             const taken = Boolean(takenSlots[slot.id]);
             const keys = SLOT_TEXT_KEYS[slot.id];
             // Names of the medicines scheduled into this slot, shown under the slot label.
-            const names = medicines.filter((item) => item.schedule === slot.id).map((item) => `${item.name} ${item.dose}`);
+            const names = medicines.filter((item) => item.schedule === slot.id).map((item) => `${item.name} ${item.dosage}`);
             return (
               <li key={slot.id} className="row row--between">
                 <div>
@@ -119,7 +119,7 @@ export function MedicinesPage() {
             return (
               <Card
                 key={item.id}
-                title={`${item.name} · ${item.dose}`}
+                title={`${item.name} · ${item.dosage}`}
                 action={low ? <Badge tone="danger">{t('pages.medicines.lowStock')}</Badge> : null}
               >
                 <div className="stack">

@@ -10,6 +10,7 @@ import { FamilyDashboard } from './pages/dashboards/FamilyDashboard.jsx';
 import { ElderDashboard } from './pages/dashboards/ElderDashboard.jsx';
 import { VolunteerDashboard } from './pages/dashboards/VolunteerDashboard.jsx';
 import { AppointmentsPage } from './pages/AppointmentsPage.jsx';
+import { ChittiPage } from './pages/ChittiPage.jsx';
 import { MedicinesPage } from './pages/MedicinesPage.jsx';
 import { CareTeamPage } from './pages/CareTeamPage.jsx';
 import { InsurancePage } from './pages/InsurancePage.jsx';
@@ -32,6 +33,7 @@ function App() {
         <Route path="/dashboard/family" element={<FamilyDashboard />} />
         <Route path="/dashboard/elder" element={<ElderDashboard />} />
         <Route path="/dashboard/volunteer" element={<VolunteerDashboard />} />
+        <Route path="/chitti" element={<ChittiPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/medicines" element={<MedicinesPage />} />
         <Route path="/care-team" element={<CareTeamPage />} />

@@ -10,6 +10,7 @@ import { Tabs } from '../../components/Tabs.jsx';
 import { Timeline } from '../../components/Timeline.jsx';
 import { Modal } from '../../components/Modal.jsx';
 import { useToast } from '../../components/ToastProvider.jsx';
+import { useEmergencyAlert } from '../../context/EmergencyAlertContext.jsx';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
 import {
   ELDERLY_PEOPLE,
@@ -123,11 +124,13 @@ export function FamilyDashboard() {
   const { t, language } = useTranslation();
   // Toast helper for confirmations.
   const { show } = useToast();
+  // Active SOS alert (if any) raised from the elder's dashboard.
+  const { alert, clearAlert } = useEmergencyAlert();
 
   // The parent this family member looks after.
   const elder = ELDERLY_PEOPLE[0];
   // The family member linked to this parent, used as the requester on new help requests.
-  const familyMember = FAMILY_MEMBERS.find((m) => m.linkedElderId === elder.id);
+  const familyMember = FAMILY_MEMBERS.find((m) => m.elderId === elder.id);
   // Caretakers assigned to this parent.
   const assignedCaretakers = CARETAKERS.filter((c) => c.assignedElderIds.includes(elder.id));
 
@@ -142,7 +145,7 @@ export function FamilyDashboard() {
   // Availability flag per caretaker id; everyone starts as available.
   const [availability, setAvailability] = useState(() => Object.fromEntries(CARETAKERS.map((c) => [c.id, true])));
   // Cab rides for this parent, including newly requested ones.
-  const [rides, setRides] = useState(() => CAB_RIDES.filter((r) => r.elderlyPerson === elder.name));
+  const [rides, setRides] = useState(() => CAB_RIDES.filter((r) => r.elderlyPerson === elder.displayName));
   // Whether the book-cab dialog is open, and which appointment it will book.
   const [cabModalOpen, setCabModalOpen] = useState(false);
   const [cabAppointmentId, setCabAppointmentId] = useState('');
@@ -161,7 +164,7 @@ export function FamilyDashboard() {
     ),
   );
   // Help requests for this parent, including newly posted ones.
-  const [helpRequests, setHelpRequests] = useState(() => HELP_REQUESTS.filter((h) => h.elderlyPerson === elder.name));
+  const [helpRequests, setHelpRequests] = useState(() => HELP_REQUESTS.filter((h) => h.elderlyPerson === elder.displayName));
   // Whether the post-help-request dialog is open, and the text typed into it.
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [helpText, setHelpText] = useState('');
@@ -206,7 +209,7 @@ export function FamilyDashboard() {
     if (!appointment) return;
     const pendingRide = {
       id: `ride-${Date.now()}`,
-      elderlyPerson: elder.name,
+      elderlyPerson: elder.displayName,
       driverName: t('family.driverTbd'),
       vehicle: t('family.driverTbd'),
       driverPhone: '',
@@ -256,7 +259,7 @@ export function FamilyDashboard() {
     if (!summary) return;
     const request = {
       id: `help-${Date.now()}`,
-      elderlyPerson: elder.name,
+      elderlyPerson: elder.displayName,
       summary,
       medicines: [],
       groceries: [],
@@ -277,6 +280,26 @@ export function FamilyDashboard() {
 
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* Care alert banner: shown the moment the elder raises something, until acknowledged.
+          Urgent (SOS / not feeling well) blinks red; calm (medicine/groceries/recharge/talk) is a plain banner. */}
+      {alert && (
+        <div
+          className={alert.severity === 'calm' ? 'care-request-banner' : 'emergency-banner'}
+          role={alert.severity === 'calm' ? 'status' : 'alert'}
+        >
+          <span className="emergency-banner__icon" aria-hidden="true">
+            {alert.severity === 'calm' ? '📋' : '🚨'}
+          </span>
+          <div className="emergency-banner__text">
+            <strong>{alert.title}</strong>
+            <p>{alert.message}</p>
+          </div>
+          <button type="button" className="btn btn-lg emergency-banner__ack" onClick={clearAlert}>
+            {t(alert.severity === 'calm' ? 'family.careRequestAcknowledge' : 'family.emergencyBannerAcknowledge')}
+          </button>
+        </div>
+      )}
+
       {/* Hero headline matching family-care-hub.html */}
       <div className="hero">
         <h1>
@@ -372,8 +395,8 @@ export function FamilyDashboard() {
         <Card title={t('family.conditionsTitle')}>
           <ul style={LIST_RESET}>
             {elder.conditions.map((condition) => (
-              <li key={condition}>
-                <Badge tone="info">{condition}</Badge>
+              <li key={condition.id}>
+                <Badge tone="info">{condition.name}</Badge>
               </li>
             ))}
           </ul>
@@ -416,7 +439,7 @@ export function FamilyDashboard() {
               const percent = SAMPLE_ADHERENCE[medicine.id] ?? 0;
               return (
                 <div key={medicine.id}>
-                  <ProgressBar value={percent} tone={adherenceTone(percent)} label={`${medicine.name} ${medicine.dose}`} />
+                  <ProgressBar value={percent} tone={adherenceTone(percent)} label={`${medicine.name} ${medicine.dosage}`} />
                   <p style={{ fontSize: '0.9rem', marginTop: '0.25rem' }}>
                     {t('family.refillBy')} {medicine.refillBy} · {t('family.refilledBy')} {medicine.refilledBy}
                   </p>
@@ -606,7 +629,7 @@ export function FamilyDashboard() {
                   {t('family.policyNumber')}: {policy.policyNumber}
                 </p>
                 <p>
-                  {t('family.coverage')}: {formatRupees(policy.coverageAmount)}
+                  {t('family.coverage')}: {formatRupees(policy.sumInsured)}
                 </p>
                 <p>
                   {t('family.annualPremium')}: {formatRupees(policy.annualPremium)}

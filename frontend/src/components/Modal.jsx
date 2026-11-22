@@ -19,14 +19,13 @@ export function Modal({ open, title, onClose, children, footer }) {
 
   if (!open) return null;
 
-  // Close when the click lands on the backdrop itself, not on the dialog content.
-  function handleBackdropClick(event) {
-    if (event.target === event.currentTarget) onClose?.();
-  }
-
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+    <div className="modal">
+      {/* A dedicated, empty backdrop element: clicking it (and only it, since
+          it has no children) closes the dialog without affecting clicks on
+          the card itself. */}
+      <div className="modal__backdrop" onClick={() => onClose?.()} aria-hidden="true" />
+      <div className="modal__card" role="dialog" aria-modal="true" aria-labelledby={titleId}>
         <header className="modal__header">
           <h2 id={titleId} className="card__title">
             {title}

@@ -9,8 +9,12 @@ import { ApiError } from "../utils/ApiError.js";
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, "name is required"),
-  // "admin" is in the enum so the request reaches the explicit 403 check below.
-  role: z.enum(["elder", "family", "volunteer", "caretaker", "admin"]),
+  // Only elder/family can self-register. volunteer/caretaker are invite-only:
+  // their account is created automatically on /care-links/accept, carrying
+  // the role from the invite (see careLink.routes.js). "admin" is in the
+  // enum so the request reaches the explicit 403 check below instead of
+  // failing validation with a less clear message.
+  role: z.enum(["elder", "family", "admin"]),
   preferredLanguage: z.enum(["te", "en"]).optional(),
   phone: z.string().optional(),
   email: z.string().optional(),

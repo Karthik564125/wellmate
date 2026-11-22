@@ -1,6 +1,8 @@
 // Sample data for the Wellmate frontend. Pure constants only; no UI code and no backend calls.
 
-// Role definitions used for role selection; labelKey points into the translations file.
+// Role definitions used for role selection in demo mode (every dashboard is
+// explorable there, regardless of the backend's real registration rules);
+// labelKey points into the translations file.
 export const ROLES = [
   { id: 'admin', labelKey: 'roles.admin' },
   { id: 'caretaker', labelKey: 'roles.caretaker' },
@@ -9,52 +11,79 @@ export const ROLES = [
   { id: 'volunteer', labelKey: 'roles.volunteer' },
 ];
 
+// Roles a real account can self-register as (matches the backend's
+// auth.routes.js registerSchema exactly). volunteer/caretaker are
+// invite-only - accepting a family member's invite creates that account
+// with the right role automatically, so they never see this picker.
+export const SELF_REGISTERABLE_ROLES = [
+  { id: 'elder', labelKey: 'roles.elder' },
+  { id: 'family', labelKey: 'roles.family' },
+];
+
 // Elderly people being cared for; status flags whether they currently need assistance.
+// Field names match the backend Elder schema (displayName, area, bloodGroup, conditions
+// as objects) so swapping this for a real API response later needs no page rewrites.
+// age/city/phone/avatar/status are demo-only conveniences with no backend equivalent yet
+// (age is also kept alongside dateOfBirth so every display site keeps working unchanged).
 export const ELDERLY_PEOPLE = [
   {
     id: 'elder-lakshmi',
-    name: 'Lakshmi Devi',
+    displayName: 'Lakshmi Devi',
     age: 72,
-    city: 'Hyderabad',
+    dateOfBirth: '1953-04-12',
+    area: 'Hyderabad',
     address: '12-2-45, Lane near Ganesh Temple, Basheerbagh, Hyderabad',
     phone: '+91 98480 11223',
     bloodGroup: 'B+',
-    conditions: ['Type 2 diabetes', 'Hypertension', 'Vitamin D deficiency'],
+    conditions: [
+      { id: 'cond-lakshmi-1', name: 'Type 2 diabetes', sinceYear: 2015, status: 'active', notes: '' },
+      { id: 'cond-lakshmi-2', name: 'Hypertension', sinceYear: 2018, status: 'active', notes: '' },
+      { id: 'cond-lakshmi-3', name: 'Vitamin D deficiency', sinceYear: 2023, status: 'managed', notes: '' },
+    ],
     avatar: 'LD',
     status: 'needs-assistance',
   },
   {
     id: 'elder-ramaiah',
-    name: 'Ramaiah Naidu',
+    displayName: 'Ramaiah Naidu',
     age: 78,
-    city: 'Hyderabad',
+    dateOfBirth: '1947-08-02',
+    area: 'Hyderabad',
     address: '5-9-18, Opposite Venkateswara Temple, Himayatnagar, Hyderabad',
     phone: '+91 97010 45678',
     bloodGroup: 'O+',
-    conditions: ['Coronary artery disease', 'Arthritis'],
+    conditions: [
+      { id: 'cond-ramaiah-1', name: 'Coronary artery disease', sinceYear: 2012, status: 'managed', notes: '' },
+      { id: 'cond-ramaiah-2', name: 'Arthritis', sinceYear: 2019, status: 'active', notes: '' },
+    ],
     avatar: 'RN',
     status: 'stable',
   },
   {
     id: 'elder-sarojini',
-    name: 'Sarojini Rao',
+    displayName: 'Sarojini Rao',
     age: 68,
-    city: 'Hyderabad',
+    dateOfBirth: '1957-11-30',
+    area: 'Hyderabad',
     address: '3-4-112, Near Shiva Temple, Kukatpally, Hyderabad',
     phone: '+91 90301 77654',
     bloodGroup: 'A+',
-    conditions: ['Asthma', 'Mild osteoporosis'],
+    conditions: [
+      { id: 'cond-sarojini-1', name: 'Asthma', sinceYear: 2010, status: 'active', notes: '' },
+      { id: 'cond-sarojini-2', name: 'Mild osteoporosis', sinceYear: 2021, status: 'managed', notes: '' },
+    ],
     avatar: 'SR',
     status: 'stable',
   },
 ];
 
 // Family members linked to an elder, with their relation and contact number.
+// name/phone already match the backend User schema; relation and elderId match CareLink.
 export const FAMILY_MEMBERS = [
-  { id: 'fam-meera', name: 'Meera', relation: 'Daughter', phone: '+91 98490 33401', linkedElderId: 'elder-lakshmi' },
-  { id: 'fam-anjali', name: 'Anjali', relation: 'Daughter-in-law', phone: '+91 98660 52210', linkedElderId: 'elder-lakshmi' },
-  { id: 'fam-ravi', name: 'Ravi', relation: 'Son', phone: '+91 99590 14870', linkedElderId: 'elder-lakshmi' },
-  { id: 'fam-suresh', name: 'Suresh', relation: 'Nephew', phone: '+91 94410 26639', linkedElderId: 'elder-ramaiah' },
+  { id: 'fam-meera', name: 'Meera', relation: 'Daughter', phone: '+91 98490 33401', elderId: 'elder-lakshmi' },
+  { id: 'fam-anjali', name: 'Anjali', relation: 'Daughter-in-law', phone: '+91 98660 52210', elderId: 'elder-lakshmi' },
+  { id: 'fam-ravi', name: 'Ravi', relation: 'Son', phone: '+91 99590 14870', elderId: 'elder-lakshmi' },
+  { id: 'fam-suresh', name: 'Suresh', relation: 'Nephew', phone: '+91 94410 26639', elderId: 'elder-ramaiah' },
 ];
 
 // Caretakers with their contact details, specialty, availability and assigned elders.
@@ -100,13 +129,21 @@ export const VOLUNTEERS = [
 ];
 
 // Medicines on the prescription with dose, timing slot, refill stock and who handles refills.
+// name/instructions/dosage match the backend Medicine schema; times/startDate/endDate are
+// added alongside for shape alignment, though the current UI still groups by the
+// schedule/timing slot fields rather than reading times[] directly.
+// stockDaysLeft/refillBy/refilledBy are demo-only: the backend has no stock-tracking
+// concept yet (DoseLog only records taken/missed/skipped per scheduled time).
 export const MEDICINES = [
   {
     id: 'med-vitd3',
     name: 'Vitamin D3',
-    dose: '60k IU',
+    dosage: '60k IU',
     schedule: 'weekly',
     timing: 'Once a week, Sunday',
+    times: ['09:00'],
+    startDate: '2024-01-01',
+    endDate: null,
     instructions: 'Take with a meal once a week on Sunday.',
     stockDaysLeft: 3,
     refillBy: 'Dec 14',
@@ -115,9 +152,12 @@ export const MEDICINES = [
   {
     id: 'med-metformin',
     name: 'Metformin',
-    dose: '500 mg',
+    dosage: '500 mg',
     schedule: 'post-breakfast',
     timing: 'Morning and night, after food',
+    times: ['08:30', '20:30'],
+    startDate: '2023-06-01',
+    endDate: null,
     instructions: 'Take after breakfast and after dinner.',
     stockDaysLeft: 4,
     refillBy: 'Nov 25',
@@ -126,9 +166,12 @@ export const MEDICINES = [
   {
     id: 'med-amlodipine',
     name: 'Amlodipine',
-    dose: '5 mg',
+    dosage: '5 mg',
     schedule: 'morning',
     timing: 'Once daily, morning',
+    times: ['07:30'],
+    startDate: '2022-03-15',
+    endDate: null,
     instructions: 'Take once daily in the morning with water.',
     stockDaysLeft: 9,
     refillBy: 'Nov 30',
@@ -137,9 +180,12 @@ export const MEDICINES = [
   {
     id: 'med-calcium',
     name: 'Calcium',
-    dose: '500 mg',
+    dosage: '500 mg',
     schedule: 'evening',
     timing: 'Once daily, night',
+    times: ['21:00'],
+    startDate: '2024-02-01',
+    endDate: null,
     instructions: 'Take once daily at night after dinner.',
     stockDaysLeft: 21,
     refillBy: 'Dec 12',
@@ -148,9 +194,12 @@ export const MEDICINES = [
   {
     id: 'med-pantoprazole',
     name: 'Pantoprazole',
-    dose: '40 mg',
+    dosage: '40 mg',
     schedule: 'afternoon',
     timing: 'Once daily, after lunch',
+    times: ['13:30'],
+    startDate: '2024-05-10',
+    endDate: null,
     instructions: 'Take once after lunch, with a glass of water.',
     stockDaysLeft: 12,
     refillBy: 'Dec 5',
@@ -318,13 +367,21 @@ export const DRIVERS = [
 ];
 
 // Insurance policies held for elders, with coverage, premium schedule and past payments.
+// provider/policyNumber/policyType/sumInsured match the backend InsurancePolicy schema;
+// validFrom/validTo/helplineNumber/coverageItems are added for shape alignment.
+// annualPremium/premiumDueDate/renewalDate/paymentHistory/status are demo-only: the
+// backend has no premium or payment-history concept on InsurancePolicy yet.
 export const INSURANCE_POLICIES = [
   {
     id: 'pol-lakshmi',
     provider: 'Star Health',
     policyNumber: 'SH-44190827',
     policyType: 'Senior citizen health plan',
-    coverageAmount: 500000,
+    sumInsured: 500000,
+    validFrom: '2024-03-15',
+    validTo: '2025-03-15',
+    helplineNumber: '1800-123-4567',
+    coverageItems: ['Hospitalisation', 'Pre and post hospitalisation', 'Day-care procedures'],
     annualPremium: 18450,
     premiumDueDate: 'Dec 01',
     renewalDate: 'Mar 15',
@@ -339,7 +396,11 @@ export const INSURANCE_POLICIES = [
     provider: 'Niva Bupa',
     policyNumber: 'NB-70215634',
     policyType: 'Critical illness cover',
-    coverageAmount: 1000000,
+    sumInsured: 1000000,
+    validFrom: '2024-01-10',
+    validTo: '2025-01-10',
+    helplineNumber: '1800-987-6543',
+    coverageItems: ['Critical illness lump sum', 'Second opinion consult'],
     annualPremium: 24800,
     premiumDueDate: 'Jan 10',
     renewalDate: 'Jan 10',

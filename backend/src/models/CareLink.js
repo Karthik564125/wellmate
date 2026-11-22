@@ -20,6 +20,12 @@ const careLinkSchema = new mongoose.Schema({
   inviteCodeHash: { type: String, select: false },
   inviteExpiresAt: { type: Date },
   relation: { type: String },
+  // Set only when inviting someone with no account yet (volunteer/caretaker
+  // are invite-only - see auth.routes.js). Accepting creates their User with
+  // this role. Left unset for the normal case: inviting another family
+  // member, who already has (or separately self-registers) an elder/family
+  // account via /auth/register.
+  inviteRole: { type: String, enum: ["volunteer", "caretaker"] },
   permissions: {
     type: [{ type: String, enum: CARELINK_PERMISSIONS }],
     default: [],

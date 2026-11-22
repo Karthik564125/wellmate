@@ -121,7 +121,7 @@ export function Sidebar({ links = [], onNavigate }) {
               <path d="M16 11a3 3 0 100-6M8 11a3 3 0 100-6M2 20c0-3 3-5 6-5s6 2 6 5M16 15c3 0 6 2 6 5" />
             </svg>
           </i>
-          <span>Family Care Hub</span>
+          <span>WellMate</span>
         </div>
 
         {/* Navigation links with exact 'on' active class */}

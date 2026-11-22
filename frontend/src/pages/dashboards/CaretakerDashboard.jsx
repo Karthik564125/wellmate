@@ -169,7 +169,7 @@ export function CaretakerDashboard() {
               <p>{t('caretaker.medicinesSubtitle')}</p>
               {assignedElders.map((elder) => (
                 <div key={elder.id} className="caretaker-elder-slots">
-                  <h3 className="card__title">{elder.name}</h3>
+                  <h3 className="card__title">{elder.displayName}</h3>
                   <div className="table-wrap">
                     <table className="table">
                       <tbody>
@@ -178,7 +178,7 @@ export function CaretakerDashboard() {
                           const isGiven = Boolean(givenSlots[`${elder.id}:${slot.id}`]);
                           // Medicines from the prescription that belong to this time slot.
                           const slotMedicines = MEDICINES.filter((medicine) => medicine.schedule === slot.id)
-                            .map((medicine) => `${medicine.name} ${medicine.dose}`)
+                            .map((medicine) => `${medicine.name} ${medicine.dosage}`)
                             .join(', ');
                           return (
                             <tr key={slot.id}>
@@ -263,7 +263,7 @@ export function CaretakerDashboard() {
                 >
                   {assignedElders.map((elder) => (
                     <option key={elder.id} value={elder.id}>
-                      {elder.name}
+                      {elder.displayName}
                     </option>
                   ))}
                 </select>
@@ -303,7 +303,7 @@ export function CaretakerDashboard() {
                   const elder = ELDERLY_PEOPLE.find((person) => person.id === note.elderId);
                   return (
                     <li key={note.id}>
-                      <strong>{elder?.name}</strong> · {note.time}
+                      <strong>{elder?.displayName}</strong> · {note.time}
                       <div>{note.text}</div>
                     </li>
                   );
@@ -327,7 +327,7 @@ export function CaretakerDashboard() {
                 return (
                   <Card
                     key={elder.id}
-                    title={elder.name}
+                    title={elder.displayName}
                     action={
                       <Badge tone={needsHelp ? 'warning' : 'success'}>
                         {needsHelp ? t('caretaker.needsAssistance') : t('caretaker.stable')}
@@ -335,11 +335,12 @@ export function CaretakerDashboard() {
                     }
                   >
                     <div className="caretaker-elder">
-                      <Avatar name={elder.name} tone="teal" />
+                      <Avatar name={elder.displayName} tone="teal" />
                       <div>
                         <p>{`${elder.age} ${t('caretaker.yearsOld')}`}</p>
                         <p>
-                          <strong>{t('caretaker.conditions')}:</strong> {elder.conditions.join(', ')}
+                          <strong>{t('caretaker.conditions')}:</strong>{' '}
+                          {elder.conditions.map((condition) => condition.name).join(', ')}
                         </p>
                       </div>
                     </div>
@@ -399,7 +400,11 @@ export function CaretakerDashboard() {
       {/* Care plan modal: lists the prescribed medicines for the selected elder */}
       <Modal
         open={Boolean(carePlanElder)}
-        title={carePlanElder ? `${t('caretaker.carePlanTitle')}: ${carePlanElder.name}` : t('caretaker.carePlanTitle')}
+        title={
+          carePlanElder
+            ? `${t('caretaker.carePlanTitle')}: ${carePlanElder.displayName}`
+            : t('caretaker.carePlanTitle')
+        }
         onClose={() => setCarePlanElderId(null)}
         footer={
           <button type="button" className="btn" onClick={() => setCarePlanElderId(null)}>
@@ -414,7 +419,7 @@ export function CaretakerDashboard() {
           <ul>
             {MEDICINES.map((medicine) => (
               <li key={medicine.id}>
-                <strong>{medicine.name}</strong> · {`${t('caretaker.medicineDose')}: ${medicine.dose}`}
+                <strong>{medicine.name}</strong> · {`${t('caretaker.medicineDose')}: ${medicine.dosage}`}
                 <div>{`${t('caretaker.medicineTiming')}: ${medicine.timing}`}</div>
                 <div>{`${t('caretaker.refillBy')}: ${medicine.refillBy}`}</div>
               </li>

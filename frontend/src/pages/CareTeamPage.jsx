@@ -26,7 +26,7 @@ function formatAvailability(availability) {
 
 // Look up an elder's display name from the mock elders list by id.
 function elderNameFor(elderId) {
-  return ELDERLY_PEOPLE.find((elder) => elder.id === elderId)?.name ?? '';
+  return ELDERLY_PEOPLE.find((elder) => elder.id === elderId)?.displayName ?? '';
 }
 
 // Care team page: caretakers with availability and shift details, assignment selects per elder and family contacts.
@@ -68,7 +68,7 @@ export function CareTeamPage() {
             const available = Boolean(availableMap[caretaker.id]);
             // Elders currently assigned to this caretaker, derived from the assignment map in state.
             const assignedNames = ELDERLY_PEOPLE.filter((elder) => elderCaretaker[elder.id] === caretaker.id).map(
-              (elder) => elder.name,
+              (elder) => elder.displayName,
             );
             return (
               <Card
@@ -127,7 +127,7 @@ export function CareTeamPage() {
             {ELDERLY_PEOPLE.map((elder) => (
               <div key={elder.id} className="field">
                 <label className="field__label" htmlFor={`assign-${elder.id}`}>
-                  {t('pages.careTeam.assignLabel')} · {elder.name}
+                  {t('pages.careTeam.assignLabel')} · {elder.displayName}
                 </label>
                 <select
                   id={`assign-${elder.id}`}
@@ -163,7 +163,7 @@ export function CareTeamPage() {
                       <strong>{t('pages.careTeam.relation')}:</strong> {member.relation}
                     </p>
                     <p>
-                      <strong>{t('pages.careTeam.linkedElder')}:</strong> {elderNameFor(member.linkedElderId)}
+                      <strong>{t('pages.careTeam.linkedElder')}:</strong> {elderNameFor(member.elderId)}
                     </p>
                   </div>
                 </div>

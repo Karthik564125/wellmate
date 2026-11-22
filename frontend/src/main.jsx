@@ -8,6 +8,7 @@ import App from './App.jsx';
 import { AuthProvider } from './auth/AuthContext.jsx';
 import { LanguageProvider } from './i18n/LanguageContext.jsx';
 import { RoleProvider } from './context/RoleContext.jsx';
+import { EmergencyAlertProvider } from './context/EmergencyAlertContext.jsx';
 import { ToastProvider } from './components/ToastProvider.jsx';
 
 // Mount the app into the #root element with all global providers wrapped around it.
@@ -17,9 +18,11 @@ createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <LanguageProvider>
           <RoleProvider>
-            <ToastProvider>
-              <App />
-            </ToastProvider>
+            <EmergencyAlertProvider>
+              <ToastProvider>
+                <App />
+              </ToastProvider>
+            </EmergencyAlertProvider>
           </RoleProvider>
         </LanguageProvider>
       </AuthProvider>
