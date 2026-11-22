@@ -1,5 +1,5 @@
 // Medicines page: daily reminder checklist, medicines grouped by timing slot, stock levels and refill tracking.
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext.jsx';
 import { useToast } from '../components/ToastProvider.jsx';
 import { SectionHeader } from '../components/SectionHeader.jsx';
@@ -42,6 +42,23 @@ const NEEDED_MEDICINES = [
 ];
 
 
+// Empty values for one medicine entry in the add medicine form.
+const EMPTY_MEDICINE_ENTRY = {
+  type: '',
+  name: '',
+  dosage: '',
+  frequency: '',
+  startDate: '',
+  endDate: '',
+  prescribedBy: '',
+  notes: '',
+};
+
+// Build one blank medicine entry with a unique key for React lists.
+function createEntry() {
+  return { ...EMPTY_MEDICINE_ENTRY, key: `entry-${Date.now()}-${Math.random().toString(36).slice(2)}` };
+}
+
 // Medicines page with the taken checklist, slot tabs, stock progress and a mark-refilled action.
 export function MedicinesPage() {
   // Translation helper and toast trigger.
@@ -57,6 +74,17 @@ export function MedicinesPage() {
   const [takenSlots, setTakenSlots] = useState({});
   // Slot tab currently selected in the schedule view.
   const [activeSlot, setActiveSlot] = useState('morning');
+  // Add medicine form: showAddForm opens the panel; entries holds one object per medicine being added.
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [entries, setEntries] = useState(() => [createEntry()]);
+  const [photoName, setPhotoName] = useState('');
+  const [formError, setFormError] = useState('');
+  const [formKey, setFormKey] = useState(0);
+  // Medicines added through the form this session. Local state only.
+  const [addedMedicines, setAddedMedicines] = useState([]);
+  // Upload box: ref opens the hidden file picker, isDragOver highlights the box while a file is dragged over.
+  const fileInputRef = useRef(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // True when every daily reminder slot has been ticked as taken.
   const allTaken = DAILY_MEDICINE_SLOTS.every((slot) => takenSlots[slot.id]);
@@ -74,6 +102,67 @@ export function MedicinesPage() {
     show(t('pages.medicines.toastRefilled'), 'success');
   }
 
+  // Open the add form with one blank medicine entry.
+  function openAddForm() {
+    setEntries([createEntry()]);
+    setPhotoName('');
+    setFormError('');
+    setFormKey((k) => k + 1);
+    setShowAddForm(true);
+  }
+
+  // Close the form without saving anything and reset it.
+  function closeAddForm() {
+    setShowAddForm(false);
+    setEntries([createEntry()]);
+    setPhotoName('');
+    setFormError('');
+  }
+
+  // Update one field of one medicine entry, found by its key.
+  function setEntryField(key, name, value) {
+    setEntries((prev) => prev.map((entry) => (entry.key === key ? { ...entry, [name]: value } : entry)));
+  }
+
+  // Append a blank medicine entry to the form.
+  function addEntry() {
+    setEntries((prev) => [...prev, createEntry()]);
+  }
+
+  // Remove one medicine entry. The first entry stays so at least one is always kept.
+  function removeEntry(key) {
+    setEntries((prev) => (prev.length > 1 ? prev.filter((entry) => entry.key !== key) : prev));
+  }
+
+  // Validate every entry, then add them to the page list and close the form.
+  function handleSaveMedicines(e) {
+    e.preventDefault();
+    const missing = entries.some((entry) => !entry.type || !entry.name.trim() || !entry.startDate);
+    if (missing) {
+      setFormError('Please fill in the required fields for each medicine.');
+      return;
+    }
+
+    const newItems = entries.map((entry) => ({
+      id: entry.key,
+      type: entry.type,
+      name: entry.name.trim(),
+      dosage: entry.dosage.trim(),
+      frequency: entry.frequency.trim(),
+      startDate: entry.startDate,
+      endDate: entry.endDate,
+      prescribedBy: entry.prescribedBy.trim(),
+      notes: entry.notes.trim(),
+      photoName,
+    }));
+    // NOTE: saving to the database is not connected yet. Entries are kept in local state only.
+    setAddedMedicines((prev) => [...prev, ...newItems]);
+    closeAddForm();
+  }
+
+  const inputStyle = { width: '100%', padding: '8px 10px', borderRadius: 8, boxSizing: 'border-box' };
+  const labelStyle = { display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 };
+
   // Medicines that belong to the selected schedule tab.
   const visibleMedicines = medicines.filter((item) => item.schedule === activeSlot);
 
@@ -84,6 +173,173 @@ export function MedicinesPage() {
     <div className="stack">
       {/* Page header with the translated section name and a short description */}
       <SectionHeader title={t('nav.medicines')} subtitle={t('pages.medicines.subtitle')} />
+
+      {/* Add medicine: button above the cards, opening the inline form panel */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <button type="button" className="btn btn-sm" onClick={openAddForm}>
+          Add medicine
+        </button>
+      </div>
+
+      {/* Add medicine form panel: shared photo at the top, then one block per medicine */}
+      {showAddForm && (
+        <div className="policy-card">
+          <h4 className="policy-provider" style={{ marginBottom: 12 }}>
+            Add medicine
+          </h4>
+          <form key={formKey} onSubmit={handleSaveMedicines} noValidate>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+              <label style={{ ...labelStyle, gridColumn: '1 / -1' }}>
+                Prescription or medicine photo (PDF or image)
+                <div
+                  className={`upload-dropzone${isDragOver ? ' upload-dropzone--active' : ''}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(true);
+                  }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(false);
+                    const file = e.dataTransfer.files[0];
+                    if (file) setPhotoName(file.name);
+                  }}
+                >
+                  <div className="upload-dropzone__content">
+                    <svg
+                      className="upload-dropzone__icon"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 15V4" />
+                      <path d="M7 9l5-5 5 5" />
+                      <path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" />
+                    </svg>
+                    <div>
+                      <p className="upload-dropzone__text">Drag and drop files here or upload</p>
+                      <p className="upload-dropzone__hint">Accepted file types: JPEG, PNG, WEBP, PDF</p>
+                    </div>
+                  </div>
+                  <button type="button" className="upload-dropzone__button" onClick={() => fileInputRef.current?.click()}>
+                    Upload
+                  </button>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="upload-dropzone__input"
+                  aria-label="Prescription or medicine photo"
+                  accept="image/jpeg,image/png,image/webp,application/pdf"
+                  onChange={(e) => setPhotoName(e.target.files[0]?.name ?? '')}
+                />
+                <span style={{ fontSize: 13, opacity: 0.8 }}>{photoName ? `Selected: ${photoName}` : 'No file chosen'}</span>
+              </label>
+            </div>
+
+            {entries.map((entry, index) => (
+              <div key={entry.key} style={{ border: '1px solid var(--color-border, #cccccc)', borderRadius: 8, padding: 12, marginTop: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <strong>Medicine {index + 1}</strong>
+                  {index > 0 && (
+                    <button type="button" className="btn btn-sm btn-secondary" onClick={() => removeEntry(entry.key)}>
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+                  <label style={labelStyle}>
+                    Medicine type *
+                    <select style={inputStyle} value={entry.type} onChange={(e) => setEntryField(entry.key, 'type', e.target.value)}>
+                      <option value="">Select type</option>
+                      <option value="Tablet">Tablet</option>
+                      <option value="Syrup">Syrup</option>
+                      <option value="Injection">Injection</option>
+                    </select>
+                  </label>
+                  <label style={labelStyle}>
+                    Medicine name *
+                    <input type="text" style={inputStyle} value={entry.name} onChange={(e) => setEntryField(entry.key, 'name', e.target.value)} />
+                  </label>
+                  <label style={labelStyle}>
+                    Dosage (for example 500 mg or 5 ml)
+                    <input type="text" style={inputStyle} value={entry.dosage} onChange={(e) => setEntryField(entry.key, 'dosage', e.target.value)} />
+                  </label>
+                  <label style={labelStyle}>
+                    Frequency or times (for example Morning, Night)
+                    <input type="text" style={inputStyle} value={entry.frequency} onChange={(e) => setEntryField(entry.key, 'frequency', e.target.value)} />
+                  </label>
+                  <label style={labelStyle}>
+                    Start date *
+                    <input type="date" style={inputStyle} value={entry.startDate} onChange={(e) => setEntryField(entry.key, 'startDate', e.target.value)} />
+                  </label>
+                  <label style={labelStyle}>
+                    End date
+                    <input type="date" style={inputStyle} value={entry.endDate} onChange={(e) => setEntryField(entry.key, 'endDate', e.target.value)} />
+                  </label>
+                  <label style={labelStyle}>
+                    Prescribed by
+                    <input type="text" style={inputStyle} value={entry.prescribedBy} onChange={(e) => setEntryField(entry.key, 'prescribedBy', e.target.value)} />
+                  </label>
+                  <label style={{ ...labelStyle, gridColumn: '1 / -1' }}>
+                    Instructions or notes
+                    <textarea rows={3} style={inputStyle} value={entry.notes} onChange={(e) => setEntryField(entry.key, 'notes', e.target.value)} />
+                  </label>
+                </div>
+              </div>
+            ))}
+
+            <div style={{ marginTop: 12 }}>
+              <button type="button" className="btn btn-sm btn-secondary" onClick={addEntry}>
+                Add another medicine
+              </button>
+            </div>
+
+            {formError && <p style={{ color: 'var(--color-danger, #e5484d)', marginTop: 12 }}>{formError}</p>}
+
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <button type="submit" className="btn btn-sm">
+                Save medicine
+              </button>
+              <button type="button" className="btn btn-sm btn-secondary" onClick={closeAddForm}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Added medicines: entries saved from the form this session, shown as a list */}
+      {addedMedicines.length > 0 && (
+        <Card title="Added medicines">
+          <ul className="stack" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {addedMedicines.map((item) => (
+              <li key={item.id} className="row row--between">
+                <div>
+                  <strong>
+                    {item.type} · {item.name}
+                  </strong>
+                  {(item.dosage || item.frequency) && (
+                    <p className="section-header__subtitle">
+                      {[item.dosage, item.frequency].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                  <p className="section-header__subtitle">
+                    Starts {item.startDate}
+                    {item.endDate ? ` · Ends ${item.endDate}` : ''}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       {/* Requested from Chitti: live medicine requests raised by the elder */}
       <Card title="Requested from Chitti">
