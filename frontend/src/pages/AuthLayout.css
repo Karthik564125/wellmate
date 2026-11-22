@@ -1,0 +1,408 @@
+/* Sign-in / sign-up theme: light cream and plum, matching the landing page.
+   Everything is scoped under .auth-page and the palette is redefined here,
+   so this file does not depend on LandingPage.css. */
+
+.auth-page {
+  --lp-plum: #5a1a3a;
+  --lp-burgundy: #3d0f27;
+  --lp-cream: #f7f1ea;
+  --lp-pink: #f6d9e0;
+  --lp-lime: #e6f27a;
+  --lp-blue: #1d5c73;
+  --lp-blue-tint: #dbe9ee;
+  --lp-white: #ffffff;
+  --lp-ink: #3d0f27;
+  --lp-mut: #6b5560;
+  --lp-line: #e6d9d0;
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--lp-cream);
+  color: var(--lp-ink);
+  font-family: Figtree, system-ui, sans-serif;
+}
+
+/* ---------- Header ---------- */
+.auth-page .auth-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 16px 32px;
+  background: var(--lp-cream);
+  border-bottom: 1px solid var(--lp-line);
+}
+
+.auth-page .auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--lp-burgundy);
+}
+
+.auth-page .auth-brand__mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px 9px 9px 3px;
+  background: var(--lp-plum);
+  color: var(--lp-white);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ---------- Body: photo + card ---------- */
+.auth-page .auth-body {
+  flex: 1;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.auth-page .auth-photo {
+  margin: 0;
+  height: 200px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--lp-pink);
+  box-shadow: 0 6px 18px rgba(61, 15, 39, 0.08);
+}
+
+.auth-page .auth-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.auth-page .auth-card {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 26px 22px 24px;
+  background: var(--lp-white);
+  border: 1px solid var(--lp-line);
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(61, 15, 39, 0.06);
+}
+
+.auth-page .auth-card__title {
+  font-family: Newsreader, Georgia, serif;
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--lp-burgundy);
+  margin: 0 0 6px;
+}
+
+.auth-page .auth-card__subtitle {
+  font-size: 14px;
+  color: var(--lp-mut);
+  margin: 0 0 20px;
+}
+
+.auth-page .auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---------- Fields ---------- */
+.auth-page .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lp-ink);
+}
+
+.auth-page .field input,
+.auth-page .field select {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 400;
+  color: var(--lp-ink);
+  background: var(--lp-white);
+  border: 1px solid var(--lp-line);
+  border-radius: 12px;
+  outline: none;
+}
+
+.auth-page .field input:focus,
+.auth-page .field select:focus {
+  border-color: var(--lp-plum);
+  box-shadow: 0 0 0 3px rgba(90, 26, 58, 0.14);
+}
+
+.auth-page .field input[aria-invalid='true'] {
+  border-color: #9b2335;
+}
+
+.auth-page .field-password {
+  position: relative;
+  display: block;
+}
+
+.auth-page .field-password input {
+  padding-right: 110px;
+}
+
+.auth-page .field-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 10px;
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lp-plum);
+  cursor: pointer;
+}
+
+.auth-page .field-toggle:hover {
+  background: var(--lp-pink);
+}
+
+.auth-page .field-error {
+  font-size: 13px;
+  font-weight: 500;
+  color: #9b2335;
+}
+
+/* ---------- Buttons ---------- */
+.auth-page .auth-form button[type='submit'],
+.auth-page .auth-form .btn--primary,
+.auth-page .btn--primary {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--lp-plum);
+  color: var(--lp-white);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.auth-page .auth-form button[type='submit']:hover:not(:disabled),
+.auth-page .btn--primary:hover:not(:disabled) {
+  background: var(--lp-burgundy);
+}
+
+.auth-page .auth-form button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.auth-page .btn-secondary,
+.auth-page .btn--block.btn-secondary {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 1px solid var(--lp-plum);
+  border-radius: 999px;
+  background: var(--lp-white);
+  color: var(--lp-plum);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.auth-page .btn-secondary:hover {
+  background: var(--lp-cream);
+}
+
+/* ---------- Divider, demo note ---------- */
+.auth-page .auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  font-size: 12px;
+  color: var(--lp-mut);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.auth-page .auth-divider::before,
+.auth-page .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--lp-line);
+}
+
+.auth-page .auth-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-page .auth-demo-note {
+  display: block;
+  margin: 0 0 4px;
+  padding: 10px 14px;
+  background: var(--lp-blue-tint);
+  color: var(--lp-blue);
+  border-left: 3px solid var(--lp-lime);
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ---------- Footer ---------- */
+.auth-page .auth-footer {
+  padding: 20px 16px 28px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--lp-mut);
+  border-top: 0;
+}
+
+.auth-page .auth-footer a {
+  color: var(--lp-plum);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Desktop: photo beside the form ---------- */
+@media (min-width: 900px) {
+  .auth-page .auth-header {
+    padding: 16px 48px;
+  }
+
+  .auth-page .auth-body {
+    flex: 1;
+    flex-direction: row;
+    align-items: start;
+    gap: 56px;
+    padding: 40px 48px 56px;
+  }
+
+  .auth-page .auth-photo {
+    flex: 1 1 0;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    max-height: 640px;
+  }
+
+  .auth-page .auth-card {
+    flex: 0 1 440px;
+    max-width: 440px;
+    padding: 32px 32px 28px;
+  }
+}
+
+/* ---------- Small phones (down to ~360px) ---------- */
+@media (max-width: 560px) {
+  .auth-page .auth-header {
+    padding: 12px 16px;
+  }
+
+  .auth-page .auth-brand {
+    font-size: 20px;
+  }
+
+  .auth-page .auth-photo {
+    height: 180px;
+  }
+
+  .auth-page .auth-card {
+    padding: 22px 18px 20px;
+  }
+
+  .auth-page .auth-card__title {
+    font-size: 24px;
+  }
+
+  .auth-page .field-password input {
+    padding-right: 96px;
+  }
+}
+
+/* ---------- Back to Home link ---------- */
+.auth-page .auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin: 16px 32px 0;
+  font-size: 14px;
+  color: var(--lp-plum);
+  text-decoration: none;
+}
+
+.auth-page .auth-back:hover {
+  text-decoration: underline;
+}
+
+/* ---------- White form controls (auth pages only) ---------- */
+/* Higher-specificity selectors so these beat the global input rules in index.css. */
+.auth-page input:not([type='checkbox']):not([type='radio']):not([type='range']),
+.auth-page select,
+.auth-page .select,
+.auth-page textarea {
+  font: inherit;
+  color: #3d0f27;
+  background: #ffffff;
+  border: 1px solid #e6d9d0;
+  border-radius: 10px;
+}
+
+.auth-page input:not([type='checkbox']):not([type='radio']):not([type='range'])::placeholder,
+.auth-page textarea::placeholder {
+  color: #9a8f94;
+  opacity: 1;
+}
+
+.auth-page input:not([type='checkbox']):not([type='radio']):not([type='range']):focus,
+.auth-page select:focus,
+.auth-page .select:focus,
+.auth-page textarea:focus {
+  outline: none;
+  border-color: #5a1a3a;
+  box-shadow: 0 0 0 3px rgba(90, 26, 58, 0.15);
+}
+
+/* Keep the red invalid-field border visible after the white base rule above. */
+.auth-page input[aria-invalid='true']:not([type='checkbox']):not([type='radio']):not([type='range']) {
+  border-color: #9b2335;
+}
+
+.auth-page input:-webkit-autofill,
+.auth-page input:-webkit-autofill:hover,
+.auth-page input:-webkit-autofill:focus,
+.auth-page textarea:-webkit-autofill,
+.auth-page select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #fff inset;
+  -webkit-text-fill-color: #3d0f27;
+}
+

@@ -2,6 +2,60 @@
 const translations = {
   // English strings
   en: {
+    // Landing page copy (English)
+    landingPage: {
+      nav: { main: 'Main', features: 'Features', plans: 'Plans' },
+      heroTitle: 'Helping families care for life\'s best chapter',
+      heroText: 'Wellmate brings medicine reminders, appointments, daily check-ins and a caring voice assistant together for elders and the family who loves them.',
+      exploreMore: 'Explore more',
+      watchVideos: 'Watch our videos',
+      ourPromise: 'Our promise',
+      unlockPotential: 'Unlock your potential',
+      aboutTitle: 'A family care hub that keeps everyone connected.',
+      aboutText: 'Wellmate keeps medicines, appointments and daily wellbeing in one calm place, so elders stay independent and families stay informed.',
+      howEyebrow: 'How it works',
+      howTitle: 'Three simple steps to calmer care days',
+      step1Title: 'Add your elder',
+      step1Text: 'Create a profile with medicines, doctors and daily routines.',
+      step2Title: 'Set reminders and visits',
+      step2Text: 'Chitti reminds elders on time, and appointments appear in one shared calendar.',
+      step3Title: 'Family stays informed',
+      step3Text: 'Family members see updates and can step in when help is needed.',
+      trustPrivacy: 'Private family records',
+      trustLanguage: 'English and తెలుగు support',
+      trustCaregivers: 'Made for elders and caregivers',
+      healthyLiving: 'Healthy living',
+      refinedLiving: 'Refined living experience',
+      dailyCare: 'Daily care highlights',
+      dailyCareTitle: 'Care that fits every day',
+      personalisedCare: 'Personalised elderly care',
+      personalisedCareText: 'Routines, vitals and reminders tailored to each elder\'s needs.',
+      doctorConsult: 'Doctor consultations',
+      doctorConsultText: 'Book and manage appointments with doctors without the hassle.',
+      familyInvolvement: 'Family involvement',
+      familyInvolvementText: 'Family members stay updated and can help from anywhere.',
+      wellnessCompanionship: 'Daily wellness and companionship',
+      wellnessCompanionshipText: 'Gentle check-ins and a friendly voice to keep every day bright.',
+      mobilitySupport: 'Mobility and support',
+      mobilitySupportText: 'Support for walking, movement and safe everyday activity.',
+      plans: 'Plans',
+      findPlan: 'Find a plan',
+      perMonth: '/month',
+      planFreeName: 'Free',
+      planFreeDesc: 'Get started with the essentials for one elder.',
+      planProName: 'Pro',
+      planProDesc: 'Everything you need for a growing family care circle.',
+      planProMaxName: 'Pro Max',
+      planProMaxDesc: 'Our most complete plan with voice, emergency help and advanced tools.',
+      helpingHand: 'Helping hand',
+      helpingPotential: 'Helping you achieve full potential',
+      volunteerText: 'Volunteer with a family near you and make a real difference.',
+      sampleFamilies: 'Families helped',
+      sampleVolunteers: 'Volunteers',
+      healthCare: 'Health Care',
+      clientsTitle: 'Clients thought about us',
+    },
+
     // App brand name and tagline shown in headers and the landing page
     brand: {
       name: 'Wellmate',
@@ -26,6 +80,7 @@ const translations = {
       usersAssignments: 'Users & assignments',
       profileSettings: 'Profile & settings',
       emergency: 'Emergency',
+      register: 'Sign Up',
       connectElder: 'Connect Elder',
       addFamilyMember: 'Add Family Member',
     },
@@ -73,6 +128,8 @@ const translations = {
           description: 'Ask nearby volunteers for medicines, groceries or a visit when family is away.',
         },
       },
+      volunteer: 'Volunteer with us',
+      seeAll: 'See all',
     },
     // Authentication screens: labels, actions, validation and demo note
     auth: {
@@ -118,6 +175,11 @@ const translations = {
       emailInUse: 'An account with this email already exists. Try signing in instead.',
       selfRegisterRoleHint:
         'Only elders and family members can create an account directly. Volunteers and caretakers are invited by a family member.',
+      backHome: 'Back to Home',
+      imageAlt: {
+        signIn: 'Elderly couple smiling together at home',
+        signUp: 'Family caring for an elderly relative',
+      },
     },
     // Common button and control labels
     common: {
@@ -791,6 +853,60 @@ const translations = {
 
   // Telugu strings (same keys as English)
   te: {
+    // Landing page copy (Telugu)
+    landingPage: {
+      nav: { main: 'ముఖ్య', features: 'ఫీచర్లు', plans: 'ప్లాన్లు' },
+      heroTitle: 'జీవితంలోని అత్యుత్తమ అధ్యాయాన్ని చూసుకోవడంలో కుటుంబాలకు తోడుగా',
+      heroText: 'మందుల రిమైండర్లు, అపాయింట్‌మెంట్లు, రోజువారీ ఆరోగ్య తనిఖీలు మరియు ప్రేమగల వాయిస్ అసిస్టెంట్‌ను పెద్దవారికి, వారిని ప్రేమించే కుటుంబానికి ఒకేచోట అందిస్తుంది.',
+      exploreMore: 'మరింత తెలుసుకోండి',
+      watchVideos: 'మా వీడియోలు చూడండి',
+      ourPromise: 'మా వాగ్దానం',
+      unlockPotential: 'మీ సామర్థ్యాన్ని అన్‌లాక్ చేయండి',
+      aboutTitle: 'ప్రతి ఒక్కరినీ కలిపి ఉంచే కుటుంబ సంరక్షణ కేంద్రం.',
+      aboutText: 'Wellmate మందులు, అపాయింట్‌మెంట్లు మరియు రోజువారీ ఆరోగ్యాన్ని ఒకే ప్రశాంతమైన చోట ఉంచుతుంది, తద్వారా పెద్దవారు స్వతంత్రంగా ఉంటారు, కుటుంబాలకు సమాచారం ఉంటుంది.',
+      howEyebrow: 'ఇది ఎలా పనిచేస్తుంది',
+      howTitle: 'ప్రశాంతమైన సంరక్షణ రోజులకు మూడు సులభమైన అడుగులు',
+      step1Title: 'పెద్దవారిని జోడించండి',
+      step1Text: 'మందులు, వైద్యులు మరియు రోజువారీ దినచర్యతో ప్రొఫైల్ సృష్టించండి.',
+      step2Title: 'రిమైండర్లు మరియు సందర్శనలు సెట్ చేయండి',
+      step2Text: 'Chitti సమయానికి గుర్తు చేస్తుంది, అపాయింట్‌మెంట్లు ఒకే షేర్డ్ క్యాలెండర్‌లో కనిపిస్తాయి.',
+      step3Title: 'కుటుంబానికి ఎప్పటికప్పుడు సమాచారం',
+      step3Text: 'సహాయం అవసరమైనప్పుడు కుటుంబ సభ్యులు అప్‌డేట్‌లు చూసి సహాయం చేయవచ్చు.',
+      trustPrivacy: 'గోప్యమైన కుటుంబ రికార్డులు',
+      trustLanguage: 'ఇంగ్లీష్ మరియు తెలుగు మద్దతు',
+      trustCaregivers: 'పెద్దవారికి మరియు సంరక్షకులకు రూపొందించబడింది',
+      healthyLiving: 'ఆరోగ్యకరమైన జీవనం',
+      refinedLiving: 'నాణ్యమైన జీవన అనుభవం',
+      dailyCare: 'రోజువారీ సంరక్షణ ముఖ్యాంశాలు',
+      dailyCareTitle: 'ప్రతిరోజూ సరిపోయే సంరక్షణ',
+      personalisedCare: 'వ్యక్తిగతీకరించిన వృద్ధుల సంరక్షణ',
+      personalisedCareText: 'ప్రతి పెద్దవారి అవసరాలకు అనుగుణంగా దినచర్య, ఆరోగ్య వివరాలు మరియు రిమైండర్లు.',
+      doctorConsult: 'వైద్యుల సంప్రదింపులు',
+      doctorConsultText: 'ఇబ్బంది లేకుండా వైద్యులతో అపాయింట్‌మెంట్లను బుక్ చేసుకోండి, నిర్వహించండి.',
+      familyInvolvement: 'కుటుంబ భాగస్వామ్యం',
+      familyInvolvementText: 'కుటుంబ సభ్యులకు తాజా సమాచారం ఉంటుంది, ఎక్కడి నుంచైనా సహాయం చేయగలరు.',
+      wellnessCompanionship: 'రోజువారీ ఆరోగ్యం మరియు తోడుగా ఉండటం',
+      wellnessCompanionshipText: 'ప్రతి రోజును ఆనందంగా ఉంచడానికి సున్నితమైన పలకరింపులు మరియు స్నేహపూర్వక స్వరం.',
+      mobilitySupport: 'కదలిక మరియు మద్దతు',
+      mobilitySupportText: 'నడక, కదలిక మరియు సురక్షితమైన రోజువారీ కార్యకలాపాలకు మద్దతు.',
+      plans: 'ప్లాన్లు',
+      findPlan: 'మీకు సరిపడే ప్లాన్ ఎంచుకోండి',
+      perMonth: '/నెల',
+      planFreeName: 'Free',
+      planFreeDesc: 'ఒక పెద్దవారికి అవసరమైన ముఖ్య సదుపాయాలతో ప్రారంభించండి.',
+      planProName: 'Pro',
+      planProDesc: 'పెరుగుతున్న కుటుంబ సంరక్షణ బృందానికి కావలసినవన్నీ.',
+      planProMaxName: 'Pro Max',
+      planProMaxDesc: 'వాయిస్, అత్యవసర సహాయం మరియు అధునాతన సాధనాలతో మా అత్యంత సమగ్ర ప్లాన్.',
+      helpingHand: 'సహాయ హస్తం',
+      helpingPotential: 'మీ పూర్తి సామర్థ్యాన్ని సాధించడంలో సహాయం',
+      volunteerText: 'మీ దగ్గరలోని ఒక కుటుంబంతో స్వచ్ఛందంగా పనిచేసి నిజమైన మార్పు తీసుకురండి.',
+      sampleFamilies: 'సహాయం పొందిన కుటుంబాలు',
+      sampleVolunteers: 'స్వచ్ఛంద సేవకులు',
+      healthCare: 'ఆరోగ్య సంరక్షణ',
+      clientsTitle: 'మా గురించి క్లయింట్లు ఏమనుకుంటున్నారు',
+    },
+
     // App brand name and tagline
     brand: {
       name: 'వెల్‌మేట్',
@@ -815,6 +931,7 @@ const translations = {
       usersAssignments: 'వినియోగదారులు & కేటాయింపులు',
       profileSettings: 'ప్రొఫైల్ & సెట్టింగ్‌లు',
       emergency: 'అత్యవసరం',
+      register: 'సైన్ అప్',
       connectElder: 'పెద్దవారితో అనుసంధానించండి',
       addFamilyMember: 'కుటుంబ సభ్యుడిని చేర్చండి',
     },
@@ -862,6 +979,8 @@ const translations = {
           description: 'కుటుంబం దూరంగా ఉన్నప్పుడు సమీప వాలంటీర్లను మందులు, కిరాణా లేదా సందర్శన కోసం అడగండి.',
         },
       },
+      volunteer: 'మాతో స్వచ్ఛందంగా పనిచేయండి',
+      seeAll: 'అన్నీ చూడండి',
     },
     // Authentication screens
     auth: {
@@ -907,6 +1026,11 @@ const translations = {
       emailInUse: 'ఈ ఇమెయిల్‌తో ఖాతా ఇప్పటికే ఉంది. బదులుగా సైన్ ఇన్ చేయండి.',
       selfRegisterRoleHint:
         'పెద్దలు మరియు కుటుంబ సభ్యులు మాత్రమే నేరుగా ఖాతా సృష్టించగలరు. వాలంటీర్లు మరియు సంరక్షకులను కుటుంబ సభ్యుడు ఆహ్వానిస్తారు.',
+      backHome: 'హోమ్‌కు తిరిగి వెళ్ళండి',
+      imageAlt: {
+        signIn: 'ఇంట్లో కలిసి నవ్వుతున్న వృద్ధ దంపతులు',
+        signUp: 'వృద్ధ బంధువును చూసుకుంటున్న కుటుంబం',
+      },
     },
     // Common buttons and controls
     common: {

@@ -38,6 +38,12 @@ export function LanguageProvider({ children }) {
     }
   }, [language]);
 
+  // Mirror the language onto <html lang> so CSS :lang() rules can pick the Telugu font.
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
+
   // Update the language; accepts only supported codes.
   const setLanguage = useCallback((next) => {
     if (next === 'en' || next === 'te') {

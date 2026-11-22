@@ -136,13 +136,13 @@ header.topbar {
 aside .logo {
   padding-bottom: 20px;
   margin-bottom: 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--line);
 }
 
 aside .side-foot {
   margin-top: auto;
   padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--line);
 }
 
 /* Mobile: tidier drawer-style nav and spacing */

@@ -10,6 +10,7 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import { ApiError, api } from '../api/client.js';
 import { RoleSelect } from '../components/RoleSelect.jsx';
 import { AuthLayout } from './AuthLayout.jsx';
+import elderlyCouplePhoto from '../assets/1.png';
 
 // Simple email shape check: something@something.tld with no spaces.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -84,6 +85,8 @@ export function SignInPage() {
     <AuthLayout
       title={t('auth.signInTitle')}
       subtitle={t('auth.signInSubtitle')}
+      image={elderlyCouplePhoto}
+      imageAlt={t('auth.imageAlt.signIn')}
       footer={
         <p>
           {t('auth.noAccount')} <Link to="/signup">{t('auth.signUp')}</Link>
