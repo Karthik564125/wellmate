@@ -32,7 +32,7 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
-      <ChittiLauncher />
+      {role === 'elder' && <ChittiLauncher />}
     </div>
   );
 }

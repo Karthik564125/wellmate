@@ -1,6 +1,6 @@
 // Family Member dashboard: overview stats, parent health and activity, medicine adherence, appointments and records, caretakers and cab rides, insurance, help requests and family tasks. All state is local to this page and starts from mock data.
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Card } from '../../components/Card.jsx';
 import { Badge } from '../../components/Badge.jsx';
 import { Avatar } from '../../components/Avatar.jsx';
@@ -126,6 +126,8 @@ export function FamilyDashboard() {
   const { show } = useToast();
   // Active SOS alert (if any) raised from the elder's dashboard.
   const { alert, clearAlert } = useEmergencyAlert();
+  // Help requests have their own sub-route (/dashboard/family/requests); there this page shows only the help card.
+  const showRequests = useLocation().pathname.endsWith('/requests');
 
   // The parent this family member looks after.
   const elder = ELDERLY_PEOPLE[0];
@@ -300,6 +302,8 @@ export function FamilyDashboard() {
         </div>
       )}
 
+      {!showRequests && (
+      <>
       {/* Hero headline matching family-care-hub.html */}
       <div className="hero">
         <h1>
@@ -683,9 +687,12 @@ export function FamilyDashboard() {
           </div>
         )}
       </Card>
+      </>
+      )}
 
       {/* Help requests and volunteers: open requests list and volunteer directory */}
       <div style={AUTO_GRID}>
+        {showRequests && (
         <Card
           title={t('family.helpTitle')}
           action={
@@ -715,7 +722,9 @@ export function FamilyDashboard() {
             </ul>
           )}
         </Card>
+        )}
 
+        {!showRequests && (
         <Card title={t('family.volunteersTitle')}>
           {VOLUNTEERS.length === 0 ? (
             <p>{t('family.noVolunteers')}</p>
@@ -736,9 +745,11 @@ export function FamilyDashboard() {
             </ul>
           )}
         </Card>
+        )}
       </div>
 
       {/* Family tasks: checkbox list with overdue flags */}
+      {!showRequests && (
       <Card title={`${t('family.tasksTitle')} · ${tasksRemaining} ${t('family.tasksRemaining')}`}>
         {tasks.length === 0 ? (
           <p>{t('family.noTasks')}</p>
@@ -765,6 +776,7 @@ export function FamilyDashboard() {
           </ul>
         )}
       </Card>
+      )}
 
       {/* Book-cab dialog: choose an upcoming appointment, then confirm to add a pending ride */}
       <Modal
