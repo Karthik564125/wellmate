@@ -4,6 +4,7 @@
 export const NAV_BY_ROLE = {
   elder: [
     { to: '/dashboard/elder', labelKey: 'nav.today', icon: 'home' },
+    { to: '/add-family-member', labelKey: 'nav.addFamilyMember', icon: 'team' },
     { to: '/medicines', labelKey: 'nav.medicines', icon: 'pill' },
     { to: '/appointments', labelKey: 'nav.appointments', icon: 'calendar' },
     { to: '/dashboard/elder#emergency', labelKey: 'nav.emergency', icon: 'alert' },
@@ -11,12 +12,11 @@ export const NAV_BY_ROLE = {
   ],
   family: [
     { to: '/dashboard/family', labelKey: 'nav.overview', icon: 'home' },
+    { to: '/connect-elder', labelKey: 'nav.connectElder', icon: 'user' },
     { to: '/medicines', labelKey: 'nav.medicines', icon: 'pill' },
     { to: '/appointments', labelKey: 'nav.appointments', icon: 'calendar' },
     { to: '/care-team', labelKey: 'nav.careTeam', icon: 'team' },
-    { to: '/cab', labelKey: 'nav.cabTransport', icon: 'cab' },
     { to: '/insurance', labelKey: 'nav.insurance', icon: 'shield' },
-    { to: '/dashboard/family/requests', labelKey: 'nav.helpRequests', icon: 'help' },
     { to: '/profile', labelKey: 'nav.profileSettings', icon: 'user' },
   ],
   caretaker: [

@@ -82,6 +82,7 @@ export function createChittiDemoEngine({ elderName, triggerAlert }) {
   function raiseMedicineRequest(medicineName) {
     triggerAlert({
       elderName,
+      medicine: medicineName,
       severity: 'calm',
       title: 'మందుల అభ్యర్థన',
       message: `${elderName}కి ${medicineName} మందు అయిపోయింది.`,

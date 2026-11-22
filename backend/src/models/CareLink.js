@@ -24,7 +24,9 @@ const careLinkSchema = new mongoose.Schema({
   // are invite-only - see auth.routes.js). Accepting creates their User with
   // this role. Left unset for the normal case: inviting another family
   // member, who already has (or separately self-registers) an elder/family
-  // account via /auth/register.
+  // account via /auth/register. Elder-to-family and family-to-elder links
+  // are made by email lookup instead (see connect-by-email below), not
+  // through this invite-code mechanism.
   inviteRole: { type: String, enum: ["volunteer", "caretaker"] },
   permissions: {
     type: [{ type: String, enum: CARELINK_PERMISSIONS }],

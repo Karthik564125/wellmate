@@ -1,5 +1,5 @@
 // Family Member dashboard: overview stats, parent health and activity, medicine adherence, appointments and records, caretakers and cab rides, insurance, help requests and family tasks. All state is local to this page and starts from mock data.
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Card } from '../../components/Card.jsx';
 import { Badge } from '../../components/Badge.jsx';
@@ -11,12 +11,13 @@ import { Timeline } from '../../components/Timeline.jsx';
 import { Modal } from '../../components/Modal.jsx';
 import { useToast } from '../../components/ToastProvider.jsx';
 import { useEmergencyAlert } from '../../context/EmergencyAlertContext.jsx';
+import { useCareRequests } from '../../context/CareRequestContext.jsx';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
+import { listDemoAppointments, updateDemoAppointment } from '../../api/appointments.js';
 import {
   ELDERLY_PEOPLE,
   FAMILY_MEMBERS,
   MEDICINES,
-  APPOINTMENTS,
   TASKS,
   INSURANCE_POLICIES,
   CAB_RIDES,
@@ -27,6 +28,22 @@ import {
   ACTIVITY_LOG,
   TIMELINE_EVENTS,
 } from '../../data/mockData.js';
+
+// Real backend appointment -> the shape this dashboard already renders.
+function fromApiAppointment(appointment) {
+  const when = new Date(appointment.scheduledAt);
+  return {
+    id: appointment.id,
+    title: appointment.title,
+    doctor: appointment.doctor,
+    place: appointment.place,
+    date: when.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
+    time: when.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase(),
+    status: appointment.status,
+    cabBooked: appointment.cabBooked,
+    past: appointment.past,
+  };
+}
 
 // Sample adherence percentage per medicine id. Display-only: mockData has no dose-level history.
 const SAMPLE_ADHERENCE = {
@@ -126,6 +143,9 @@ export function FamilyDashboard() {
   const { show } = useToast();
   // Active SOS alert (if any) raised from the elder's dashboard.
   const { alert, clearAlert } = useEmergencyAlert();
+  // Nearby care requests a volunteer has responded to (e.g. "available to bring sugar tablets").
+  const { requests: careRequests } = useCareRequests();
+  const volunteerUpdates = careRequests.filter((request) => request.status === 'responded');
   // Help requests have their own sub-route (/dashboard/family/requests); there this page shows only the help card.
   const showRequests = useLocation().pathname.endsWith('/requests');
 
@@ -138,8 +158,21 @@ export function FamilyDashboard() {
 
   // Missed-dose alerts still waiting for a follow-up.
   const [missedAlerts, setMissedAlerts] = useState(MISSED_DOSE_ALERTS);
-  // Appointments, copied into state so "Book cab" can flag a cab as booked.
-  const [appointments, setAppointments] = useState(APPOINTMENTS);
+  // Appointments: fetched from the same real, shared demo-elder data the
+  // Appointments page reads/writes, so changes made from either screen show
+  // up on both instead of each keeping its own disconnected mock copy.
+  const [appointments, setAppointments] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    listDemoAppointments()
+      .then(({ appointments: fetched }) => {
+        if (!cancelled) setAppointments(fetched.map(fromApiAppointment));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   // Which appointment list is showing: upcoming or past.
   const [appointmentTab, setAppointmentTab] = useState('upcoming');
   // Which timeline filter is selected.
@@ -224,6 +257,7 @@ export function FamilyDashboard() {
     setAppointments((previous) => previous.map((a) => (a.id === appointment.id ? { ...a, cabBooked: true } : a)));
     setCabModalOpen(false);
     show(t('family.toastCabBooked'), 'success');
+    updateDemoAppointment(appointment.id, { cabBooked: true }).catch(() => {});
   }
 
   // Flip one caretaker's availability and confirm the change.
@@ -301,6 +335,23 @@ export function FamilyDashboard() {
           </button>
         </div>
       )}
+
+      {/* Volunteer response banner: shown as soon as a nearby volunteer responds to a care request. */}
+      {volunteerUpdates.map((request) => (
+        <div key={request.id} className="care-request-banner" role="status">
+          <span className="emergency-banner__icon" aria-hidden="true">
+            {request.response === 'available' ? '🙋' : 'ℹ️'}
+          </span>
+          <div className="emergency-banner__text">
+            <strong>{request.response === 'available' ? 'Volunteer available' : 'Volunteer update'}</strong>
+            <p>
+              {request.response === 'available'
+                ? `${request.volunteerName} is available to ${request.actionText}.`
+                : `${request.volunteerName} is not available to ${request.actionText} right now.`}
+            </p>
+          </div>
+        </div>
+      ))}
 
       {!showRequests && (
       <>
@@ -394,9 +445,10 @@ export function FamilyDashboard() {
         </Card>
       </div>
 
-      {/* Parent details and conditions */}
+      {/* Savitramma's health stats, emergency address and everyday activities.
+          These values are placeholders (mock data) until the API is connected. */}
       <div style={AUTO_GRID}>
-        <Card title={t('family.conditionsTitle')}>
+        <Card title="Savitramma's present health stats">
           <ul style={LIST_RESET}>
             {elder.conditions.map((condition) => (
               <li key={condition.id}>
@@ -404,12 +456,12 @@ export function FamilyDashboard() {
               </li>
             ))}
           </ul>
+          <p style={{ marginTop: '1rem' }}>
+            Blood group: <strong>{elder.bloodGroup}</strong>
+          </p>
         </Card>
 
-        <Card title={t('family.vitalsTitle')}>
-          <p>
-            {t('family.bloodGroup')}: <strong>{elder.bloodGroup}</strong>
-          </p>
+        <Card title="Emergency address">
           <p>
             {t('family.phone')}: <a href={toTelHref(elder.phone)}>{elder.phone}</a>
           </p>
@@ -418,7 +470,7 @@ export function FamilyDashboard() {
           </p>
         </Card>
 
-        <Card title={t('family.activityTitle')}>
+        <Card title="Today activity">
           {ACTIVITY_LOG.length === 0 ? (
             <p>{t('family.noActivity')}</p>
           ) : (

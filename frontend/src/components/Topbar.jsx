@@ -1,5 +1,6 @@
 // Topbar component: patient/role summary, language switcher, role selector, conditional + Add (admin only), and logout.
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext.jsx';
 import { useRole } from '../context/RoleContext.jsx';
 import { useTranslation } from '../i18n/LanguageContext.jsx';
 import { LanguageSwitcher } from './LanguageSwitcher.jsx';
@@ -16,9 +17,9 @@ const ROLE_PROFILES = {
     bg: '#1d5c73',
   },
   caretaker: {
-    name: 'Kavitha Reddy',
+    name: 'Vasudha',
     subtitle: 'Care Assistant · Active Shift',
-    initials: 'KR',
+    initials: 'VA',
     bg: '#2f7a57',
   },
   volunteer: {
@@ -34,9 +35,9 @@ const ROLE_PROFILES = {
     bg: '#3a6ea5',
   },
   elder: {
-    name: 'Lakshmi Devi',
+    name: 'Savitramma',
     subtitle: 'Age 72, lives in Hyderabad',
-    initials: 'LD',
+    initials: 'SA',
     bg: '#8a5a7a',
   },
 };
@@ -47,9 +48,22 @@ export function Topbar() {
   const { role, setRole } = useRole();
   const { show } = useToast();
   const navigate = useNavigate();
+  const { user, loading: authLoading, signOutUser } = useAuth();
 
-  // Resolve the active role profile; fall back to elder entry when the role is unknown.
+  // No real signed-in account: this is demo mode, same check as every other demo-aware screen.
+  const demoMode = !authLoading && !user;
+
+  // The topbar always shows the demo persona for the active "Viewing as" role,
+  // even when a real account happens to be signed in - the role switcher should
+  // always be the source of truth for what's displayed here.
   const profile = ROLE_PROFILES[role] ?? ROLE_PROFILES.elder;
+
+  // Demo mode just navigates home (there's no real session to end); a real
+  // account also actually signs out of Firebase, not just navigates away.
+  function handleLogout() {
+    if (!demoMode) signOutUser().catch(() => {});
+    navigate('/');
+  }
 
   // Navigate directly to the corresponding dashboard whenever the demo role is switched.
   const handleRoleChange = (nextRole) => {
@@ -98,9 +112,9 @@ export function Topbar() {
       )}
 
       {/* Logout button */}
-      <Link to="/" className="btn g sm" style={{ textDecoration: 'none' }}>
+      <button type="button" className="btn g sm" onClick={handleLogout}>
         {t('common.logout')}
-      </Link>
+      </button>
     </header>
   );
 }

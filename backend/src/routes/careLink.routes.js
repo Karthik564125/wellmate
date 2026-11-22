@@ -12,7 +12,7 @@ import { z } from "zod";
 import { authenticate as defaultAuthenticate, requireUser } from "../middleware/authenticate.js";
 import { authorize, authorizeLinked, canAccessElder } from "../middleware/authorize.js";
 import CareLink, { CARELINK_PERMISSIONS } from "../models/CareLink.js";
-import Elder from "../models/Elder.js";
+import Elder, { toPublicElder } from "../models/Elder.js";
 import User, { toPublicUser } from "../models/User.js";
 import {
   INVITE_TTL_DAYS,
@@ -22,9 +22,14 @@ import {
 import { ApiError } from "../utils/ApiError.js";
 
 const DEFAULT_INVITE_PERMISSIONS = ["viewMedicines"];
+// A family member who connects to an elder by email gets full access
+// straight away - no separate approval step, same as the family member who
+// originally created the elder via POST /elders.
+const DEFAULT_CONNECT_PERMISSIONS = [...CARELINK_PERMISSIONS];
 
 // volunteer/caretaker only: those two roles are invite-only (see auth.routes.js).
-// elder/family are never set here - they self-register normally, before accepting.
+// elder/family are never set here - they self-register normally, then connect
+// to each other by email (see /elders/connect-by-email below), not by code.
 const INVITE_ROLES = ["volunteer", "caretaker"];
 
 const inviteSchema = z.object({
@@ -43,6 +48,11 @@ const acceptSchema = z.object({
 
 const linkUpdateSchema = z.object({
   permissions: z.array(z.enum(CARELINK_PERMISSIONS)).optional(),
+  relation: z.string().trim().optional(),
+});
+
+const connectByEmailSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Invalid email"),
   relation: z.string().trim().optional(),
 });
 
@@ -189,6 +199,86 @@ export function createCareLinkRouter(deps = {}) {
 
     res.json({ carelink: toPublicCareLink(link), user: toPublicUser(user) });
   });
+
+  // Reuses an existing link if one is already there (idempotent for retries),
+  // otherwise creates a fresh active one.
+  async function findOrCreateActiveLink({ elderId, userId, relation, permissions, invitedBy }) {
+    const existing = await CareLinkModel.findOne({ elderId, userId });
+    if (existing) {
+      if (existing.status !== "active") {
+        existing.status = "active";
+        if (relation) existing.relation = relation;
+        await existing.save();
+      }
+      return existing;
+    }
+    return CareLinkModel.create({ elderId, userId, relation, permissions, status: "active", invitedBy });
+  }
+
+  // Connects the signed-in family/admin account to an elder who has already
+  // self-registered with this email - no invite code needed, since that
+  // account (and so this email) already exists. If they have no Elder
+  // profile yet (self-registering as "elder" only creates the User), one is
+  // created here from their own account name.
+  router.post("/elders/connect-by-email", authenticate, requireUser, async (req, res) => {
+    if (!["family", "admin"].includes(req.user.role)) {
+      throw ApiError.forbidden("Only family members or admins can connect to an elder");
+    }
+
+    const body = parseBody(connectByEmailSchema, req.body, "Invalid connect data");
+
+    const elderUser = await UserModel.findOne({ email: body.email, role: "elder" });
+    if (!elderUser) {
+      throw ApiError.notFound(
+        "No elder account found with that email. Ask them to sign up with this email first, then try again."
+      );
+    }
+
+    let elder = await ElderModel.findOne({ userId: elderUser._id });
+    if (!elder) {
+      elder = await ElderModel.create({ userId: elderUser._id, displayName: elderUser.name });
+    }
+
+    const link = await findOrCreateActiveLink({
+      elderId: elder._id,
+      userId: req.user._id,
+      relation: body.relation,
+      permissions: DEFAULT_CONNECT_PERMISSIONS,
+      invitedBy: req.user._id,
+    });
+
+    res.status(201).json({ elder: toPublicElder(elder), carelink: toPublicCareLink(link) });
+  });
+
+  // Connects a family member to this elder by email - callable by the elder
+  // themself (via canAccessElder's owner bypass) or an existing family
+  // editor. Mirrors connect-by-email above, in the other direction.
+  router.post(
+    "/elders/:elderId/family/connect-by-email",
+    authenticate,
+    requireUser,
+    authorize("editProfile", authDeps),
+    async (req, res) => {
+      const body = parseBody(connectByEmailSchema, req.body, "Invalid connect data");
+
+      const familyUser = await UserModel.findOne({ email: body.email, role: "family" });
+      if (!familyUser) {
+        throw ApiError.notFound(
+          "No family account found with that email. Ask them to sign up with this email first, then try again."
+        );
+      }
+
+      const link = await findOrCreateActiveLink({
+        elderId: req.params.elderId,
+        userId: familyUser._id,
+        relation: body.relation,
+        permissions: DEFAULT_CONNECT_PERMISSIONS,
+        invitedBy: req.user._id,
+      });
+
+      res.status(201).json({ carelink: toPublicCareLink(link) });
+    }
+  );
 
   router.get(
     "/elders/:elderId/family",
