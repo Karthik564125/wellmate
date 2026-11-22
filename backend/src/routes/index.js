@@ -4,9 +4,11 @@
 
 import { Router } from "express";
 
+import appointmentRoutes from "./appointment.routes.js";
 import assistantRoutes from "./assistant.routes.js";
 import careLinkRoutes from "./careLink.routes.js";
 import careRequestRoutes from "./careRequest.routes.js";
+import caretakerRoutes from "./caretaker.routes.js";
 import conditionRoutes from "./condition.routes.js";
 import doctorRoutes from "./doctor.routes.js";
 import elderRoutes from "./elder.routes.js";
@@ -23,6 +25,8 @@ router.use(careLinkRoutes);
 router.use(careRequestRoutes);
 router.use(conditionRoutes);
 router.use(doctorRoutes);
+router.use(appointmentRoutes);
+router.use(caretakerRoutes);
 router.use(emergencyContactRoutes);
 router.use(insuranceRoutes);
 router.use(medicineRoutes);

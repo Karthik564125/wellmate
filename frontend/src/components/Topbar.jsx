@@ -1,10 +1,22 @@
 // Topbar component: patient/role summary, language switcher, role selector, conditional + Add (admin only), and logout.
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext.jsx';
+import { api } from '../api/client.js';
 import { useRole } from '../context/RoleContext.jsx';
 import { useTranslation } from '../i18n/LanguageContext.jsx';
 import { LanguageSwitcher } from './LanguageSwitcher.jsx';
 import { RoleSelect } from './RoleSelect.jsx';
 import { useToast } from './ToastProvider.jsx';
+
+// Two letters to show in the avatar circle for a real account's own name
+// (demo roles use a fixed ROLE_PROFILES.initials instead - see below).
+function getInitials(name) {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
 
 // Per-role metadata: name shown in the header, subtitle line, avatar initials and avatar background colour.
 // This map keeps all role-specific UI strings in one place so the topbar renders dynamically for every role.
@@ -47,9 +59,49 @@ export function Topbar() {
   const { role, setRole } = useRole();
   const { show } = useToast();
   const navigate = useNavigate();
+  const { user, loading: authLoading, signOutUser } = useAuth();
 
-  // Resolve the active role profile; fall back to elder entry when the role is unknown.
-  const profile = ROLE_PROFILES[role] ?? ROLE_PROFILES.elder;
+  // No real signed-in account: this is demo mode, same check as every other demo-aware screen.
+  const demoMode = !authLoading && !user;
+
+  // Real account: fetch the signed-in user's own name/role from the backend,
+  // instead of showing one of the fixed demo personas below.
+  const [realUser, setRealUser] = useState(null);
+  useEffect(() => {
+    if (demoMode || !user) {
+      setRealUser(null);
+      return;
+    }
+    let cancelled = false;
+    api
+      .get('/me')
+      .then((me) => {
+        if (!cancelled) setRealUser(me.user);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [demoMode, user]);
+
+  // Resolve the active profile: the real signed-in account's own name/role
+  // once loaded, otherwise the demo persona for the active role.
+  const profile =
+    !demoMode && realUser
+      ? {
+          name: realUser.name,
+          subtitle: `WellMate · ${t(`roles.${realUser.role}`)}`,
+          initials: getInitials(realUser.name),
+          bg: '#3a6ea5',
+        }
+      : (ROLE_PROFILES[role] ?? ROLE_PROFILES.elder);
+
+  // Demo mode just navigates home (there's no real session to end); a real
+  // account also actually signs out of Firebase, not just navigates away.
+  function handleLogout() {
+    if (!demoMode) signOutUser().catch(() => {});
+    navigate('/');
+  }
 
   // Navigate directly to the corresponding dashboard whenever the demo role is switched.
   const handleRoleChange = (nextRole) => {
@@ -98,9 +150,9 @@ export function Topbar() {
       )}
 
       {/* Logout button */}
-      <Link to="/" className="btn g sm" style={{ textDecoration: 'none' }}>
+      <button type="button" className="btn g sm" onClick={handleLogout}>
         {t('common.logout')}
-      </Link>
+      </button>
     </header>
   );
 }

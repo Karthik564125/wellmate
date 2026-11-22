@@ -17,6 +17,9 @@ const ELDER_CREATOR_ROLES = ["admin", "family"];
 
 const profileUpdateSchema = z.object({
   displayName: z.string().trim().min(1).optional(),
+  // Not enforced as required here (the frontend's add-elder form does that) -
+  // an admin or a quick bootstrap shouldn't be blocked without one.
+  email: z.string().trim().email("Invalid email").optional(),
   dateOfBirth: z.coerce.date().optional(),
   gender: z.enum(ELDER_GENDERS).optional(),
   bloodGroup: z.string().optional(),

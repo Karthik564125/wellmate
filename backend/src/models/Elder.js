@@ -10,6 +10,9 @@ const elderSchema = new mongoose.Schema(
     // no userId.
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     displayName: { type: String, required: true },
+    // Collected so the elder can later be invited to sign up for their own
+    // account (not wired yet - see createElderSchema in elder.routes.js).
+    email: { type: String, lowercase: true, trim: true },
     dateOfBirth: { type: Date },
     gender: { type: String, enum: ELDER_GENDERS },
     bloodGroup: { type: String },
@@ -27,6 +30,7 @@ export function toPublicElder(elder) {
   return {
     id: String(elder._id),
     displayName: elder.displayName,
+    email: elder.email ?? null,
     dateOfBirth: elder.dateOfBirth,
     gender: elder.gender,
     bloodGroup: elder.bloodGroup,

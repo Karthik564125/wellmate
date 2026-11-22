@@ -117,6 +117,20 @@ export function fakeCrudModel(initialDocs = []) {
       const [removed] = docs.splice(idx, 1);
       return removed ?? null;
     },
+    // Filter-based variants (e.g. { _id, elderId } together) - used by
+    // routes that scope a write by more than just the id.
+    findOneAndUpdate: async (filter, update) => {
+      const idx = docs.findIndex((d) => applyFilter([d], filter).length > 0);
+      if (idx === -1) return null;
+      docs[idx] = { ...docs[idx], ...(update.$set ?? {}) };
+      return docs[idx];
+    },
+    findOneAndDelete: async (filter) => {
+      const idx = docs.findIndex((d) => applyFilter([d], filter).length > 0);
+      if (idx === -1) return null;
+      const [removed] = docs.splice(idx, 1);
+      return removed ?? null;
+    },
   };
 }
 

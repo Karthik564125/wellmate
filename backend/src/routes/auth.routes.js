@@ -17,7 +17,9 @@ const registerSchema = z.object({
   role: z.enum(["elder", "family", "admin"]),
   preferredLanguage: z.enum(["te", "en"]).optional(),
   phone: z.string().optional(),
-  email: z.string().optional(),
+  // Lowercased/trimmed so later email-based lookups (e.g. connecting an
+  // elder and a family member to each other) match reliably.
+  email: z.string().trim().toLowerCase().optional(),
 });
 
 // deps is optional; tests pass a fake authenticate and a fake UserModel.

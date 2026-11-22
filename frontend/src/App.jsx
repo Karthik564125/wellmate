@@ -10,6 +10,8 @@ import { FamilyDashboard } from './pages/dashboards/FamilyDashboard.jsx';
 import { ElderDashboard } from './pages/dashboards/ElderDashboard.jsx';
 import { VolunteerDashboard } from './pages/dashboards/VolunteerDashboard.jsx';
 import { AppointmentsPage } from './pages/AppointmentsPage.jsx';
+import { ConnectElderPage } from './pages/ConnectElderPage.jsx';
+import { AddFamilyMemberPage } from './pages/AddFamilyMemberPage.jsx';
 import { ChittiPage } from './pages/ChittiPage.jsx';
 import { MedicinesPage } from './pages/MedicinesPage.jsx';
 import { CareTeamPage } from './pages/CareTeamPage.jsx';
@@ -38,6 +40,8 @@ function App() {
         <Route path="/dashboard/volunteer/elders" element={<VolunteerDashboard />} />
         <Route path="/chitti" element={<ChittiPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
+        <Route path="/connect-elder" element={<ConnectElderPage />} />
+        <Route path="/add-family-member" element={<AddFamilyMemberPage />} />
         <Route path="/medicines" element={<MedicinesPage />} />
         <Route path="/care-team" element={<CareTeamPage />} />
         <Route path="/insurance" element={<InsurancePage />} />

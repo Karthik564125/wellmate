@@ -9,15 +9,31 @@ import { Modal } from '../../components/Modal.jsx';
 import { useToast } from '../../components/ToastProvider.jsx';
 import { useEmergencyAlert } from '../../context/EmergencyAlertContext.jsx';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
+import { listDemoAppointments } from '../../api/appointments.js';
 import {
   ELDERLY_PEOPLE,
   MEDICINES,
   DAILY_MEDICINE_SLOTS,
-  APPOINTMENTS,
   FAMILY_MEMBERS,
   CARETAKERS,
   ACTIVITY_LOG,
 } from '../../data/mockData.js';
+
+// Real backend appointment -> the shape this card already renders.
+function fromApiAppointment(appointment) {
+  const when = new Date(appointment.scheduledAt);
+  return {
+    id: appointment.id,
+    title: appointment.title,
+    doctor: appointment.doctor,
+    place: appointment.place,
+    date: when.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }),
+    time: when.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase(),
+    status: appointment.status,
+    cabBooked: appointment.cabBooked,
+    past: appointment.past,
+  };
+}
 
 // Maps each slot id to its key stem in the medicineTiming translations (e.g. post-breakfast -> postBreakfast).
 const SLOT_TRANSLATION_KEYS = {
@@ -63,8 +79,24 @@ export function ElderDashboard() {
   const caretaker = CARETAKERS.find((c) => c.assignedElderIds.includes(elder.id));
   // Family members linked to this elder, used as emergency contacts.
   const contacts = FAMILY_MEMBERS.filter((m) => m.elderId === elder.id);
+
+  // Appointments: fetched from the same real, shared demo-elder data the
+  // Appointments page reads/writes, so adding or deleting one there shows up
+  // here too, instead of each screen keeping its own disconnected mock copy.
+  const [appointments, setAppointments] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    listDemoAppointments()
+      .then(({ appointments: fetched }) => {
+        if (!cancelled) setAppointments(fetched.map(fromApiAppointment));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   // Only appointments that have not happened yet.
-  const upcoming = APPOINTMENTS.filter((a) => !a.past);
+  const upcoming = appointments.filter((a) => !a.past);
 
   // Taken state per slot id; every slot starts as not taken.
   const [takenSlots, setTakenSlots] = useState(() =>
