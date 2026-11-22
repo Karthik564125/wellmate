@@ -16,6 +16,7 @@ import emergencyContactRoutes from "./emergencyContact.routes.js";
 import healthRoutes from "./health.routes.js";
 import insuranceRoutes from "./insurance.routes.js";
 import medicineRoutes from "./medicine.routes.js";
+import sarvamRoutes from "./sarvam.routes.js";
 
 const router = Router();
 
@@ -31,5 +32,6 @@ router.use(emergencyContactRoutes);
 router.use(insuranceRoutes);
 router.use(medicineRoutes);
 router.use(assistantRoutes);
+router.use("/sarvam", sarvamRoutes);
 
 export default router;

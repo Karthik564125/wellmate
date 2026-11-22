@@ -35,7 +35,9 @@ const envSchema = z.object({
   GROQ_MODEL: z.string().min(1),
 
   // --- Sarvam AI (speech-to-text / text-to-speech) ---
-  SARVAM_API_KEY: z.string().min(1),
+  // Optional so the server still boots without Sarvam; code that needs a key
+  // checks for it and answers 503 instead.
+  SARVAM_API_KEY: z.string().optional(),
   SARVAM_STT_MODEL: z.string().optional(),
   // bulbul:v3 is Sarvam's own API default and the model "shubh" (below) is
   // confirmed to require - set explicitly so a future default change on
@@ -44,6 +46,23 @@ const envSchema = z.object({
   // "shubh" is Sarvam's documented male voice recommended for Telugu/Hindi.
   // Override to try a different voice without a code change.
   SARVAM_TTS_SPEAKER: z.string().default("shubh"),
+
+  // --- Sarvam Samvaad (app-runtime session tickets and proxy) ---
+  SARVAM_APP_ID: z.string().optional(),
+  SARVAM_WORKSPACE_ID: z.string().optional(),
+  SARVAM_ORG_ID: z.string().optional(),
+  // HMAC key for short-lived session tickets. Server-side only.
+  SARVAM_SESSION_TICKET_SECRET: z.string().optional(),
+  // A blank value falls back to the default: a blank .env line would otherwise
+  // fail url() and exit the process.
+  SARVAM_RUNTIME_BASE_URL: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().url().default("https://apps.sarvam.ai/api/app-runtime")
+  ),
+  SARVAM_SESSION_PATH: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().default("/session")
+  ),
 
   // --- Resend (email) ---
   RESEND_API_KEY: z.string().min(1),
