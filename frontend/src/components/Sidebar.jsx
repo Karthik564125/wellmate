@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from '../i18n/LanguageContext.jsx';
+import wellmateIcon from '../assets/wellmate-icon.jpeg';
 
 // Vector SVG icon renderer matching family-care-hub.html icon shapes.
 function NavIcon({ name }) {
@@ -116,11 +117,7 @@ export function Sidebar({ links = [], onNavigate }) {
       <aside id="nav" className={`sidebar${open ? ' sidebar--open' : ''}`} aria-label="Main">
         {/* Logo matching family-care-hub.html */}
         <div className="logo">
-          <i>
-            <svg className="i" viewBox="0 0 24 24" style={{ stroke: '#14313d' }} aria-hidden="true">
-              <path d="M16 11a3 3 0 100-6M8 11a3 3 0 100-6M2 20c0-3 3-5 6-5s6 2 6 5M16 15c3 0 6 2 6 5" />
-            </svg>
-          </i>
+          <img className="brand-logo-icon" src={wellmateIcon} alt="" aria-hidden="true" />
           <span>WellMate</span>
         </div>
 

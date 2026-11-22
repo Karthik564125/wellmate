@@ -16,7 +16,7 @@ export const NAV_BY_ROLE = {
     { to: '/care-team', labelKey: 'nav.careTeam', icon: 'team' },
     { to: '/cab', labelKey: 'nav.cabTransport', icon: 'cab' },
     { to: '/insurance', labelKey: 'nav.insurance', icon: 'shield' },
-    { to: '/dashboard/volunteer', labelKey: 'nav.helpRequests', icon: 'help' },
+    { to: '/dashboard/family/requests', labelKey: 'nav.helpRequests', icon: 'help' },
     { to: '/profile', labelKey: 'nav.profileSettings', icon: 'user' },
   ],
   caretaker: [
@@ -28,8 +28,8 @@ export const NAV_BY_ROLE = {
   ],
   volunteer: [
     { to: '/dashboard/volunteer', labelKey: 'nav.dashboard', icon: 'grid' },
-    { to: '/dashboard/volunteer#requests', labelKey: 'nav.helpRequests', icon: 'help' },
-    { to: '/dashboard/volunteer#elders', labelKey: 'nav.elders', icon: 'user' },
+    { to: '/dashboard/volunteer/requests', labelKey: 'nav.helpRequests', icon: 'help' },
+    { to: '/dashboard/volunteer/elders', labelKey: 'nav.elders', icon: 'user' },
     { to: '/profile', labelKey: 'nav.profileSettings', icon: 'user' },
   ],
   admin: [

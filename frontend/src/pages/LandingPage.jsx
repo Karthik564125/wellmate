@@ -4,6 +4,8 @@ import { useTranslation } from '../i18n/LanguageContext.jsx';
 import { useRole } from '../context/RoleContext.jsx';
 import { ROLES } from '../data/mockData.js';
 import { LanguageSwitcher } from '../components/LanguageSwitcher.jsx';
+import wellmateLogo from '../assets/wellmate.jpeg';
+import wellmateIcon from '../assets/wellmate-icon.jpeg';
 
 // Feature keys shown as cards; each maps to landing.features.<key>.title and landing.features.<key>.description in translations.
 const FEATURE_KEYS = ['roleDashboards', 'medicineReminders', 'appointments', 'cabBooking', 'insurance', 'volunteerHelp'];
@@ -68,9 +70,7 @@ export function LandingPage() {
       {/* Header with brand and auth links */}
       <header className="landing-header">
         <Link to="/" className="auth-brand">
-          <svg className="auth-brand__mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-            <path d="M16 2C9 2 3 7.5 3 15c0 6.2 4.6 11.3 10.6 12.7L16 30l2.4-2.3C24.4 26.3 29 21.2 29 15 29 7.5 23 2 16 2z" fill="currentColor" />
-          </svg>
+          <img className="brand-logo-icon" src={wellmateIcon} alt="" aria-hidden="true" />
           <span>{t('brand.name')}</span>
         </Link>
 
@@ -84,12 +84,19 @@ export function LandingPage() {
 
       {/* Hero section with headline, subtitle and calls to action */}
       <section className="landing-hero">
-        <div className="landing-hero__tagline">{t('brand.tagline')}</div>
-        <h1>{t('landing.heroTitle')}</h1>
-        <p className="landing-hero__subtitle">{t('landing.heroSubtitle')}</p>
-        <div className="landing-hero__actions">
-          <Link to="/signup" className="btn btn-primary btn-lg">{t('landing.ctaSignUp')}</Link>
-          <Link to="/signin" className="btn btn-secondary btn-lg">{t('landing.ctaSignIn')}</Link>
+        <div className="hero-split">
+          <div className="hero-split__media">
+            <img className="brand-logo-full" src={wellmateLogo} alt="Wellmate" />
+          </div>
+          <div className="hero-split__copy">
+            <div className="landing-hero__tagline">{t('brand.tagline')}</div>
+            <h1>{t('landing.heroTitle')}</h1>
+            <p className="landing-hero__subtitle">{t('landing.heroSubtitle')}</p>
+            <div className="landing-hero__actions">
+              <Link to="/signup" className="btn btn-primary btn-lg">{t('landing.ctaSignUp')}</Link>
+              <Link to="/signin" className="btn btn-secondary btn-lg">{t('landing.ctaSignIn')}</Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -134,6 +141,52 @@ export function LandingPage() {
           ))}
         </div>
       </section>
+
+      {/* Subscription plans: sample tiers for the demo, pricing not yet confirmed */}
+      <section className="landing-section">
+        <h2>Plans</h2>
+        <p className="landing-section__subtitle">Sample plans for the demo.</p>
+
+        <div className="plan-grid">
+          <article className="plan-card">
+            <h3 className="plan-card__name">Free</h3>
+            <p className="plan-card__desc">Get started with one elder.</p>
+            <div className="plan-card__price">0</div>
+            <ul className="plan-card__list">
+              <li>Basic family care hub</li>
+              <li>Shared appointments and medicine timeline</li>
+              <li>1 elder profile</li>
+            </ul>
+            <button type="button" className="btn btn-secondary btn--block">Choose Free</button>
+          </article>
+          <article className="plan-card plan-card--featured">
+            <span className="plan-card__tag">Most popular</span>
+            <h3 className="plan-card__name">Pro</h3>
+            <p className="plan-card__desc">Help and reminders for active families.</p>
+            <div className="plan-card__price">5000</div>
+            <ul className="plan-card__list">
+              <li>Everything in Free</li>
+              <li>Help requests and volunteer matching</li>
+              <li>Reminders and refill tracker</li>
+              <li>Up to 5 elder profiles</li>
+            </ul>
+            <button type="button" className="btn btn--primary btn--block">Choose Pro</button>
+          </article>
+          <article className="plan-card">
+            <h3 className="plan-card__name">Pro Max</h3>
+            <p className="plan-card__desc">Full access for larger care teams.</p>
+            <div className="plan-card__price">10000</div>
+            <ul className="plan-card__list">
+              <li>Everything in Pro</li>
+              <li>Role-based access for all family members</li>
+              <li>Care-team and insurance tools</li>
+              <li>Unlimited elder profiles</li>
+            </ul>
+            <button type="button" className="btn btn--primary btn--block">Choose Pro Max</button>
+          </article>
+        </div>
+      </section>
+
 
       {/* Footer with the medical disclaimer */}
       <footer className="landing-footer">

@@ -1,6 +1,7 @@
 // Volunteer dashboard: lists every registered elder, shows incoming help requests to accept or decline,
 // tracks assigned and completed work in tabs, and keeps a notification feed. All data is mock state for now.
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Card } from '../../components/Card.jsx';
 import { Tabs } from '../../components/Tabs.jsx';
 import { Badge } from '../../components/Badge.jsx';
@@ -80,6 +81,11 @@ export function VolunteerDashboard() {
   const { t } = useTranslation();
   // Toast helper for confirming accept, decline and complete actions.
   const { show } = useToast();
+  // The current route decides which section(s) this page shows: overview, requests or elders.
+  const { pathname } = useLocation();
+  const showRequests = pathname.endsWith('/requests');
+  const showElders = pathname.endsWith('/elders');
+  const showOverview = !showRequests && !showElders;
 
   // Help requests with live status (open, accepted, declined, completed), seeded from mock data.
   const [requests, setRequests] = useState(() => HELP_REQUESTS.map((request) => ({ ...request })));
@@ -180,7 +186,8 @@ export function VolunteerDashboard() {
 
   return (
     <div style={{ display: 'grid', gap: '1.5rem' }}>
-      {/* Header: volunteer identity and area */}
+      {/* Header: volunteer identity and area (overview only) */}
+      {showOverview && (
       <Card>
         <div style={{ ...rowStyle, alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -196,15 +203,19 @@ export function VolunteerDashboard() {
         </div>
         <p style={{ margin: '0.75rem 0 0' }}>{t('volunteer.pageSubtitle')}</p>
       </Card>
+      )}
 
-      {/* Summary stat cards */}
+      {/* Summary stat cards (overview only) */}
+      {showOverview && (
       <div style={responsiveGrid('200px')}>
         {stats.map((stat) => (
           <StatCard key={stat.label} value={stat.value} label={stat.label} tone={stat.tone} />
         ))}
       </div>
+      )}
 
-      {/* New help requests and the notification feed */}
+      {/* New help requests and the notification feed (requests only) */}
+      {showRequests && (<>
       <div style={responsiveGrid('320px')}>
         <Card id="requests" title={t('volunteer.requestsTitle')}>
           <p style={{ marginTop: 0, opacity: 0.8 }}>{t('volunteer.requestsSubtitle')}</p>
@@ -293,8 +304,10 @@ export function VolunteerDashboard() {
           )}
         </div>
       </Card>
+      </>)}
 
-      {/* Registered elders with search and a needs-assistance flag */}
+      {/* Registered elders with search and a needs-assistance flag (elders only) */}
+      {showElders && (
       <Card id="elders" action={<Badge tone="info">{visibleElders.length}</Badge>}>
         <SectionHeader title={t('volunteer.eldersTitle')} subtitle={t('volunteer.eldersSubtitle')} />
         <label style={{ display: 'grid', gap: '0.35rem', margin: '0.5rem 0 1rem' }}>
@@ -342,6 +355,7 @@ export function VolunteerDashboard() {
           </ul>
         )}
       </Card>
+      )}
     </div>
   );
 }

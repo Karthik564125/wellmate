@@ -31,8 +31,11 @@ function App() {
         <Route path="/dashboard/admin" element={<AdminDashboard />} />
         <Route path="/dashboard/caretaker" element={<CaretakerDashboard />} />
         <Route path="/dashboard/family" element={<FamilyDashboard />} />
+        <Route path="/dashboard/family/requests" element={<FamilyDashboard />} />
         <Route path="/dashboard/elder" element={<ElderDashboard />} />
         <Route path="/dashboard/volunteer" element={<VolunteerDashboard />} />
+        <Route path="/dashboard/volunteer/requests" element={<VolunteerDashboard />} />
+        <Route path="/dashboard/volunteer/elders" element={<VolunteerDashboard />} />
         <Route path="/chitti" element={<ChittiPage />} />
         <Route path="/appointments" element={<AppointmentsPage />} />
         <Route path="/medicines" element={<MedicinesPage />} />
