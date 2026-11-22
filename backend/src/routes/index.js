@@ -4,6 +4,7 @@
 
 import { Router } from "express";
 
+import assistantRoutes from "./assistant.routes.js";
 import careLinkRoutes from "./careLink.routes.js";
 import careRequestRoutes from "./careRequest.routes.js";
 import conditionRoutes from "./condition.routes.js";
@@ -25,5 +26,6 @@ router.use(doctorRoutes);
 router.use(emergencyContactRoutes);
 router.use(insuranceRoutes);
 router.use(medicineRoutes);
+router.use(assistantRoutes);
 
 export default router;

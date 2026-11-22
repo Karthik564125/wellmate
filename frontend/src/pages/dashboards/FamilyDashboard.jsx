@@ -10,6 +10,7 @@ import { Tabs } from '../../components/Tabs.jsx';
 import { Timeline } from '../../components/Timeline.jsx';
 import { Modal } from '../../components/Modal.jsx';
 import { useToast } from '../../components/ToastProvider.jsx';
+import { useEmergencyAlert } from '../../context/EmergencyAlertContext.jsx';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
 import {
   ELDERLY_PEOPLE,
@@ -123,6 +124,8 @@ export function FamilyDashboard() {
   const { t, language } = useTranslation();
   // Toast helper for confirmations.
   const { show } = useToast();
+  // Active SOS alert (if any) raised from the elder's dashboard.
+  const { alert, clearAlert } = useEmergencyAlert();
 
   // The parent this family member looks after.
   const elder = ELDERLY_PEOPLE[0];
@@ -277,6 +280,26 @@ export function FamilyDashboard() {
 
   return (
     <div className="stack" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* Care alert banner: shown the moment the elder raises something, until acknowledged.
+          Urgent (SOS / not feeling well) blinks red; calm (medicine/groceries/recharge/talk) is a plain banner. */}
+      {alert && (
+        <div
+          className={alert.severity === 'calm' ? 'care-request-banner' : 'emergency-banner'}
+          role={alert.severity === 'calm' ? 'status' : 'alert'}
+        >
+          <span className="emergency-banner__icon" aria-hidden="true">
+            {alert.severity === 'calm' ? '📋' : '🚨'}
+          </span>
+          <div className="emergency-banner__text">
+            <strong>{alert.title}</strong>
+            <p>{alert.message}</p>
+          </div>
+          <button type="button" className="btn btn-lg emergency-banner__ack" onClick={clearAlert}>
+            {t(alert.severity === 'calm' ? 'family.careRequestAcknowledge' : 'family.emergencyBannerAcknowledge')}
+          </button>
+        </div>
+      )}
+
       {/* Hero headline matching family-care-hub.html */}
       <div className="hero">
         <h1>

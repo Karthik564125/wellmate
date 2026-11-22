@@ -36,10 +36,14 @@ const envSchema = z.object({
 
   // --- Sarvam AI (speech-to-text / text-to-speech) ---
   SARVAM_API_KEY: z.string().min(1),
-  // Model names are still unconfirmed (backend todo open decision 4), so these
-  // stay optional until the Sarvam spike settles on exact model names.
   SARVAM_STT_MODEL: z.string().optional(),
-  SARVAM_TTS_MODEL: z.string().optional(),
+  // bulbul:v3 is Sarvam's own API default and the model "shubh" (below) is
+  // confirmed to require - set explicitly so a future default change on
+  // Sarvam's side can't silently break the speaker/model pairing.
+  SARVAM_TTS_MODEL: z.string().default("bulbul:v3"),
+  // "shubh" is Sarvam's documented male voice recommended for Telugu/Hindi.
+  // Override to try a different voice without a code change.
+  SARVAM_TTS_SPEAKER: z.string().default("shubh"),
 
   // --- Resend (email) ---
   RESEND_API_KEY: z.string().min(1),

@@ -1,12 +1,23 @@
 // Sample data for the Wellmate frontend. Pure constants only; no UI code and no backend calls.
 
-// Role definitions used for role selection; labelKey points into the translations file.
+// Role definitions used for role selection in demo mode (every dashboard is
+// explorable there, regardless of the backend's real registration rules);
+// labelKey points into the translations file.
 export const ROLES = [
   { id: 'admin', labelKey: 'roles.admin' },
   { id: 'caretaker', labelKey: 'roles.caretaker' },
   { id: 'family', labelKey: 'roles.family' },
   { id: 'elder', labelKey: 'roles.elder' },
   { id: 'volunteer', labelKey: 'roles.volunteer' },
+];
+
+// Roles a real account can self-register as (matches the backend's
+// auth.routes.js registerSchema exactly). volunteer/caretaker are
+// invite-only - accepting a family member's invite creates that account
+// with the right role automatically, so they never see this picker.
+export const SELF_REGISTERABLE_ROLES = [
+  { id: 'elder', labelKey: 'roles.elder' },
+  { id: 'family', labelKey: 'roles.family' },
 ];
 
 // Elderly people being cared for; status flags whether they currently need assistance.

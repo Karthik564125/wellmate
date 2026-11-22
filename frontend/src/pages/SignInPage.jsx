@@ -1,8 +1,13 @@
-// Sign-in page: validates email and password inline, then runs a demo login that sets the role and opens its dashboard.
+// Sign-in page: real Firebase email/password sign-in, routed to the correct
+// dashboard by the backend's own record of the account's role. A separate
+// "continue in demo mode" path below it skips auth entirely and stays
+// exactly as it always has, for exploring any dashboard with sample data.
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../i18n/LanguageContext.jsx';
 import { useRole } from '../context/RoleContext.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
+import { ApiError, api } from '../api/client.js';
 import { RoleSelect } from '../components/RoleSelect.jsx';
 import { AuthLayout } from './AuthLayout.jsx';
 
@@ -13,19 +18,25 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function SignInPage() {
   // Translation helper for all visible text.
   const { t } = useTranslation();
-  // Current role from context, plus setter used by the demo login.
+  // Current role from context, plus setter used after a real or demo sign-in.
   const { role, setRole } = useRole();
-  // Router navigate function for redirecting after login.
+  // Real Firebase sign-in, from the auth context.
+  const { signInWithEmail } = useAuth();
+  // Router navigate function for redirecting after sign-in.
   const navigate = useNavigate();
 
-  // Form field state.
+  // Real sign-in form field state.
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState(role);
   // Whether the password text is visible.
   const [showPassword, setShowPassword] = useState(false);
-  // Inline error messages keyed by field name.
+  // Inline error messages keyed by field name ("form" for a general failure).
   const [errors, setErrors] = useState({});
+  // True while a real sign-in request is in flight.
+  const [submitting, setSubmitting] = useState(false);
+
+  // Demo-mode role chooser; independent of the real sign-in form above it.
+  const [demoRole, setDemoRole] = useState(role);
 
   // Check the fields and return an object of translated error messages (empty when valid).
   function validate() {
@@ -36,14 +47,37 @@ export function SignInPage() {
     return next;
   }
 
-  // Handle submit: validate, then set the chosen role and go to its dashboard.
-  function handleSubmit(event) {
+  // Handle the real sign-in: Firebase first, then ask the backend who this
+  // account actually is (role, linked elders) and route accordingly.
+  async function handleSubmit(event) {
     event.preventDefault();
     const found = validate();
     setErrors(found);
     if (Object.keys(found).length > 0) return;
-    setRole(selectedRole);
-    navigate(`/dashboard/${selectedRole}`);
+
+    setSubmitting(true);
+    try {
+      await signInWithEmail(email.trim(), password);
+      const me = await api.get('/me');
+      setRole(me.user.role);
+      navigate(`/dashboard/${me.user.role}`);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        // Signed in to Firebase, but no backend User exists for this account yet.
+        setErrors({ form: t('auth.noAccountFound') });
+      } else {
+        setErrors({ form: t('auth.signInFailed') });
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // Demo mode: no Firebase, no backend call - exactly the previous behavior.
+  function handleDemoMode(event) {
+    event.preventDefault();
+    setRole(demoRole);
+    navigate(`/dashboard/${demoRole}`);
   }
 
   return (
@@ -56,9 +90,6 @@ export function SignInPage() {
         </p>
       }
     >
-      {/* Demo notice explaining sign-in is not connected yet */}
-      <p className="auth-demo-note">{t('auth.demoNote')}</p>
-
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
         {/* Email field */}
         <label className="field">
@@ -96,16 +127,29 @@ export function SignInPage() {
           {errors.password && <span className="field-error" role="alert">{errors.password}</span>}
         </label>
 
-        {/* Role chooser for the demo login */}
-        <label className="field">
-          <span>{t('auth.role')}</span>
-          <RoleSelect value={selectedRole} onChange={setSelectedRole} />
-        </label>
+        {errors.form && (
+          <p className="field-error" role="alert">
+            {errors.form}
+          </p>
+        )}
 
-        <button type="submit" className="btn btn--primary btn--block">
-          {t('auth.signIn')}
+        <button type="submit" className="btn btn--primary btn--block" disabled={submitting}>
+          {submitting ? t('auth.signingIn') : t('auth.signIn')}
         </button>
       </form>
+
+      <div className="auth-divider">{t('auth.orDivider')}</div>
+
+      <div className="auth-demo">
+        <p className="auth-demo-note">{t('auth.demoNote')}</p>
+        <label className="field">
+          <span>{t('auth.role')}</span>
+          <RoleSelect value={demoRole} onChange={setDemoRole} />
+        </label>
+        <button type="button" className="btn btn-secondary btn--block" onClick={handleDemoMode}>
+          {t('auth.continueDemoMode')}
+        </button>
+      </div>
     </AuthLayout>
   );
 }

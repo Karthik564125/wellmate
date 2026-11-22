@@ -1,9 +1,11 @@
-// Dropdown for choosing the active role; options come from ROLES and are translated.
+// Dropdown for choosing a role; options default to the full ROLES list
+// (demo mode) but can be narrowed, e.g. to SELF_REGISTERABLE_ROLES for a real
+// sign-up form where only some roles can be chosen directly.
 import { ROLES } from '../data/mockData.js';
 import { useTranslation } from '../i18n/LanguageContext.jsx';
 
 // Role <select>; value is a role id and onChange receives the newly chosen id.
-export function RoleSelect({ value, onChange }) {
+export function RoleSelect({ value, onChange, roles = ROLES }) {
   const { t } = useTranslation();
   return (
     <select
@@ -12,7 +14,7 @@ export function RoleSelect({ value, onChange }) {
       value={value}
       onChange={(event) => onChange(event.target.value)}
     >
-      {ROLES.map((role) => (
+      {roles.map((role) => (
         <option key={role.id} value={role.id}>
           {t(role.labelKey)}
         </option>

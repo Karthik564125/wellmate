@@ -28,10 +28,10 @@ const ROLE_PROFILES = {
     bg: '#b0612b',
   },
   family: {
-    name: 'Lakshmi Devi',
-    subtitle: 'Family Care Hub · Cared by Meera',
-    initials: 'LD',
-    bg: '#8a5a7a',
+    name: 'Ramakrishna',
+    subtitle: 'WellMate · GrandSon of Lakshmi Devi',
+    initials: 'RA',
+    bg: '#3a6ea5',
   },
   elder: {
     name: 'Lakshmi Devi',

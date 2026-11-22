@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useRole } from '../context/RoleContext.jsx';
 import { NAV_BY_ROLE } from '../routes/navConfig.js';
+import { ChittiLauncher } from './ChittiLauncher.jsx';
 import { Sidebar } from './Sidebar.jsx';
 import { Topbar } from './Topbar.jsx';
 
@@ -31,6 +32,7 @@ export function AppLayout() {
           <Outlet />
         </main>
       </div>
+      <ChittiLauncher />
     </div>
   );
 }

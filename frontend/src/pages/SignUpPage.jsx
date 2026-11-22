@@ -1,55 +1,64 @@
-// Sign-up page: collects name, email, phone, password, confirmation and role, validates inline, then runs a demo sign-up.
+// Sign-up page: real Firebase account creation plus backend registration,
+// restricted to the roles that can actually self-register (elder/family -
+// volunteer/caretaker are invite-only, see SELF_REGISTERABLE_ROLES). A
+// separate "continue in demo mode" path below it skips all of this, exactly
+// as before, for exploring any dashboard with sample data.
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from '../i18n/LanguageContext.jsx';
 import { useRole } from '../context/RoleContext.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
 import { useToast } from '../components/ToastProvider.jsx';
+import { ApiError, api } from '../api/client.js';
 import { RoleSelect } from '../components/RoleSelect.jsx';
+import { SELF_REGISTERABLE_ROLES } from '../data/mockData.js';
 import { AuthLayout } from './AuthLayout.jsx';
 
 // Simple email shape check: something@something.tld with no spaces.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Phone check: optional leading +, then 7 to 15 digits, spaces or dashes.
 const PHONE_PATTERN = /^\+?[0-9][0-9\s-]{6,14}$/;
-// Minimum password length accepted by the demo.
+// Minimum password length Firebase (and this form) accepts.
 const MIN_PASSWORD_LENGTH = 6;
 
-// Sign-up form page; on success it sets the chosen role, shows a toast and opens that role's dashboard.
+// Default to the role the demo picker was last set to, if it's actually one
+// that can self-register; otherwise fall back to "family".
+function initialSelfRegisterRole(contextRole) {
+  return SELF_REGISTERABLE_ROLES.some((r) => r.id === contextRole) ? contextRole : 'family';
+}
+
 export function SignUpPage() {
-  // Translation helper for all visible text.
   const { t } = useTranslation();
-  // Current role from context, plus setter used by the demo sign-up.
   const { role, setRole } = useRole();
-  // Toast helper for the success message.
+  const { signUpWithEmail } = useAuth();
   const { show } = useToast();
-  // Router navigate function for redirecting after sign-up.
   const navigate = useNavigate();
 
-  // Form field state.
+  // Real sign-up form state.
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
     password: '',
     confirmPassword: '',
-    role,
+    role: initialSelfRegisterRole(role),
   });
-  // Inline error messages keyed by field name.
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
-  // Update one field in the form state.
+  // Demo-mode role chooser (any of the five roles); independent of the real form above it.
+  const [demoRole, setDemoRole] = useState(role);
+
   function updateField(field, value) {
     setForm((previous) => ({ ...previous, [field]: value }));
   }
 
-  // Check every field and return an object of translated error messages (empty when valid).
   function validate() {
     const next = {};
     if (!form.name.trim()) next.name = t('auth.validation.nameRequired');
     if (!form.email.trim()) next.email = t('auth.validation.emailRequired');
     else if (!EMAIL_PATTERN.test(form.email.trim())) next.email = t('auth.validation.emailInvalid');
-    if (!form.phone.trim()) next.phone = t('auth.validation.phoneInvalid');
-    else if (!PHONE_PATTERN.test(form.phone.trim())) next.phone = t('auth.validation.phoneInvalid');
+    if (form.phone.trim() && !PHONE_PATTERN.test(form.phone.trim())) next.phone = t('auth.validation.phoneInvalid');
     if (!form.password) next.password = t('auth.validation.passwordRequired');
     else if (form.password.length < MIN_PASSWORD_LENGTH) next.password = t('auth.validation.passwordTooShort');
     if (form.confirmPassword !== form.password) next.confirmPassword = t('auth.validation.passwordMismatch');
@@ -57,15 +66,44 @@ export function SignUpPage() {
     return next;
   }
 
-  // Handle submit: validate, then set the role, show a success toast and navigate to the dashboard.
-  function handleSubmit(event) {
+  // Real sign-up: create the Firebase account, then register the matching
+  // backend User with the chosen role (elder/family only).
+  async function handleSubmit(event) {
     event.preventDefault();
     const found = validate();
     setErrors(found);
     if (Object.keys(found).length > 0) return;
-    setRole(form.role);
-    show(t('auth.signUpSuccess'), 'success');
-    navigate(`/dashboard/${form.role}`);
+
+    setSubmitting(true);
+    try {
+      await signUpWithEmail(form.email.trim(), form.password);
+      const { user } = await api.post('/auth/register', {
+        name: form.name.trim(),
+        role: form.role,
+        phone: form.phone.trim() || undefined,
+        email: form.email.trim(),
+      });
+      setRole(user.role);
+      show(t('auth.signUpSuccess'), 'success');
+      navigate(`/dashboard/${user.role}`);
+    } catch (err) {
+      if (err?.code === 'auth/email-already-in-use') {
+        setErrors({ email: t('auth.emailInUse') });
+      } else if (err instanceof ApiError) {
+        setErrors({ form: t('auth.signUpFailed') });
+      } else {
+        setErrors({ form: t('auth.signUpFailed') });
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // Demo mode: no Firebase, no backend call - exactly the previous behavior.
+  function handleDemoMode(event) {
+    event.preventDefault();
+    setRole(demoRole);
+    navigate(`/dashboard/${demoRole}`);
   }
 
   // Shared markup for one labelled text input with its inline error.
@@ -95,9 +133,6 @@ export function SignUpPage() {
         </p>
       }
     >
-      {/* Demo notice explaining sign-up is not connected yet */}
-      <p className="auth-demo-note">{t('auth.demoNote')}</p>
-
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
         {renderInput('name', t('auth.name'), 'text', 'name')}
         {renderInput('email', t('auth.email'), 'email', 'email')}
@@ -105,17 +140,43 @@ export function SignUpPage() {
         {renderInput('password', t('auth.password'), 'password', 'new-password')}
         {renderInput('confirmPassword', t('auth.confirmPassword'), 'password', 'new-password')}
 
-        {/* Role chooser; the selection decides which dashboard opens after sign-up */}
+        {/* Only elder/family here: volunteer/caretaker are invite-only. */}
         <label className="field">
           <span>{t('auth.role')}</span>
-          <RoleSelect value={form.role} onChange={(value) => updateField('role', value)} />
+          <RoleSelect
+            value={form.role}
+            onChange={(value) => updateField('role', value)}
+            roles={SELF_REGISTERABLE_ROLES}
+          />
+          <span className="auth-demo-note" style={{ marginTop: 8 }}>
+            {t('auth.selfRegisterRoleHint')}
+          </span>
           {errors.role && <span className="field-error" role="alert">{errors.role}</span>}
         </label>
 
-        <button type="submit" className="btn btn--primary btn--block">
-          {t('auth.signUp')}
+        {errors.form && (
+          <p className="field-error" role="alert">
+            {errors.form}
+          </p>
+        )}
+
+        <button type="submit" className="btn btn--primary btn--block" disabled={submitting}>
+          {submitting ? t('auth.creatingAccount') : t('auth.signUp')}
         </button>
       </form>
+
+      <div className="auth-divider">{t('auth.orDivider')}</div>
+
+      <div className="auth-demo">
+        <p className="auth-demo-note">{t('auth.demoNote')}</p>
+        <label className="field">
+          <span>{t('auth.role')}</span>
+          <RoleSelect value={demoRole} onChange={setDemoRole} />
+        </label>
+        <button type="button" className="btn btn-secondary btn--block" onClick={handleDemoMode}>
+          {t('auth.continueDemoMode')}
+        </button>
+      </div>
     </AuthLayout>
   );
 }

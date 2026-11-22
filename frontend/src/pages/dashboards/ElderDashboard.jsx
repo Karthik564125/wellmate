@@ -7,6 +7,7 @@ import { ProgressBar } from '../../components/ProgressBar.jsx';
 import { SectionHeader } from '../../components/SectionHeader.jsx';
 import { Modal } from '../../components/Modal.jsx';
 import { useToast } from '../../components/ToastProvider.jsx';
+import { useEmergencyAlert } from '../../context/EmergencyAlertContext.jsx';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
 import {
   ELDERLY_PEOPLE,
@@ -53,6 +54,8 @@ export function ElderDashboard() {
   const { t, language } = useTranslation();
   // Toast helper for confirmations and alerts.
   const { show } = useToast();
+  // Shared alert state so the family/caretaker dashboards can show this the moment it's sent.
+  const { triggerAlert } = useEmergencyAlert();
 
   // The logged-in elder for this demo.
   const elder = ELDERLY_PEOPLE[0];
@@ -108,10 +111,16 @@ export function ElderDashboard() {
     show(t('elder.toastNotYet'), 'info');
   }
 
-  // Close the emergency modal and confirm the alert was sent.
+  // Close the emergency modal, confirm the alert was sent, and raise it for family/caretaker to see.
   function sendEmergencyAlert() {
     setAlertOpen(false);
     show(t('elder.toastAlert'), 'danger');
+    triggerAlert({
+      elderName: elder.displayName,
+      severity: 'urgent',
+      title: t('family.emergencyBannerTitle'),
+      message: `${elder.displayName} ${t('family.emergencyBannerBody')}`,
+    });
   }
 
   // Open emergency confirmation modal when hash changes to #emergency
