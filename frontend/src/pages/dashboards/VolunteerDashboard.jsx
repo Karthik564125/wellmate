@@ -10,6 +10,7 @@ import { StatCard } from '../../components/StatCard.jsx';
 import { SectionHeader } from '../../components/SectionHeader.jsx';
 import { EmptyState } from '../../components/EmptyState.jsx';
 import { useToast } from '../../components/ToastProvider.jsx';
+import { useCareRequests } from '../../context/CareRequestContext.jsx';
 import { ELDERLY_PEOPLE, VOLUNTEERS, HELP_REQUESTS } from '../../data/mockData.js';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
 
@@ -81,6 +82,8 @@ export function VolunteerDashboard() {
   const { t } = useTranslation();
   // Toast helper for confirming accept, decline and complete actions.
   const { show } = useToast();
+  // Shared nearby-care requests (e.g. "needs sugar tablets") that this volunteer can respond to.
+  const { requests: careRequests, respond: respondToCareRequest } = useCareRequests();
   // The current route decides which section(s) this page shows: overview, requests or elders.
   const { pathname } = useLocation();
   const showRequests = pathname.endsWith('/requests');
@@ -159,6 +162,16 @@ export function VolunteerDashboard() {
     setNotifications((previous) => previous.filter((item) => item.id !== notificationId));
   }
 
+  // Respond to a nearby care request; the elder and family dashboards pick up the
+  // same response from the shared context, and this volunteer's view marks it taken.
+  function handleCareResponse(request, response) {
+    respondToCareRequest(request.id, { volunteerName: CURRENT_VOLUNTEER.name, response });
+    show(
+      response === 'available' ? t('volunteer.toastMarkedAvailable') : t('volunteer.toastMarkedNotAvailable'),
+      response === 'available' ? 'success' : 'info',
+    );
+  }
+
   // Handle smooth scroll when navigating to anchor hashes (#requests or #elders)
   useEffect(() => {
     if (window.location.hash) {
@@ -212,6 +225,55 @@ export function VolunteerDashboard() {
           <StatCard key={stat.label} value={stat.value} label={stat.label} tone={stat.tone} />
         ))}
       </div>
+      )}
+
+      {/* Nearby care requests: quick available/not-available response, shared with the elder and family dashboards (overview only).
+          Each request gets its own card, with a small staggered entrance animation and hover lift. */}
+      {showOverview && (
+        <>
+          <SectionHeader title={t('volunteer.careRequestsTitle')} subtitle={t('volunteer.careRequestsSubtitle')} />
+          {careRequests.length === 0 ? (
+            <EmptyState title={t('volunteer.noCareRequests')} />
+          ) : (
+          <div style={responsiveGrid('320px')}>
+            {careRequests.map((request, index) => (
+              <div
+                key={request.id}
+                className="card care-request-card"
+                style={{ padding: '1rem', '--care-card-delay': `${index * 0.08}s` }}
+              >
+                <div style={rowStyle}>
+                  <strong>{request.elderName}</strong>
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                    <Badge
+                      tone="info"
+                      className={request.status === 'open' ? 'care-request-card__new-badge' : undefined}
+                    >
+                      {request.title}
+                    </Badge>
+                    {request.status === 'responded' && <Badge tone="success">{t('volunteer.taken')}</Badge>}
+                  </div>
+                </div>
+                <p style={{ margin: '0.5rem 0' }}>{request.question}</p>
+                {request.status === 'open' ? (
+                  <div style={actionRowStyle}>
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => handleCareResponse(request, 'available')}>
+                      {t('volunteer.available')}
+                    </button>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => handleCareResponse(request, 'not-available')}>
+                      {t('volunteer.notAvailable')}
+                    </button>
+                  </div>
+                ) : (
+                  <p style={{ margin: 0, opacity: 0.8 }}>
+                    {request.response === 'available' ? t('volunteer.youMarkedAvailable') : t('volunteer.youMarkedNotAvailable')}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+          )}
+        </>
       )}
 
       {/* New help requests and the notification feed (requests only) */}

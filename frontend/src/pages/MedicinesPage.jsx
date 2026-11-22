@@ -8,6 +8,7 @@ import { Tabs } from '../components/Tabs.jsx';
 import { Badge } from '../components/Badge.jsx';
 import { ProgressBar } from '../components/ProgressBar.jsx';
 import { EmptyState } from '../components/EmptyState.jsx';
+import { useEmergencyAlert } from '../context/EmergencyAlertContext.jsx';
 import { MEDICINES, DAILY_MEDICINE_SLOTS } from '../data/mockData.js';
 
 // Stock level (in days) that counts as low and shows the low-stock badge.
@@ -33,11 +34,22 @@ const SCHEDULE_TABS = [
   { id: 'weekly', labelKey: 'pages.medicines.slotWeekly' },
 ];
 
+// Mock data for the "Medicines needed" card (not from the backend).
+const NEEDED_MEDICINES = [
+  { name: 'Fever tablet (Paracetamol 650 mg)', note: 'Requested via Chitti for Savitramma', status: 'Requested today' },
+  { name: 'Metformin 500 mg', note: 'Refill needed', status: 'Refill due this week' },
+  { name: 'Amlodipine 5 mg', note: 'Refill needed', status: 'Refill due this week' },
+];
+
+
 // Medicines page with the taken checklist, slot tabs, stock progress and a mark-refilled action.
 export function MedicinesPage() {
   // Translation helper and toast trigger.
   const { t } = useTranslation();
   const { show } = useToast();
+  // Medicine requests raised by the elder via Chitti, and a way to mark one done.
+  const { medicineRequests, clearMedicineRequest } = useEmergencyAlert();
+
 
   // Medicine list kept in state so refills update the stock figures.
   const [medicines, setMedicines] = useState(() => MEDICINES.map((item) => ({ ...item })));
@@ -72,6 +84,53 @@ export function MedicinesPage() {
     <div className="stack">
       {/* Page header with the translated section name and a short description */}
       <SectionHeader title={t('nav.medicines')} subtitle={t('pages.medicines.subtitle')} />
+
+      {/* Requested from Chitti: live medicine requests raised by the elder */}
+      <Card title="Requested from Chitti">
+        {medicineRequests.length === 0 && <p className="section-header__subtitle">No requests from Chitti yet.</p>}
+        <ul className="stack" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {medicineRequests.map((item) => (
+            <li key={item.id} className="row row--between">
+              <div>
+                <strong>{item.medicine}</strong>
+                <p className="section-header__subtitle">Requested by {item.elderName} via Chitti</p>
+                <p className="section-header__subtitle">{new Date(item.triggeredAt).toLocaleString()}</p>
+              </div>
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => clearMedicineRequest(item.id)}>
+                Mark done
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Card>
+
+      {/* Medicines needed: mock requests and refills for the family member view */}
+      <Card title="Medicines needed">
+        <div
+          style={{
+            border: '1px solid #e0a84a',
+            background: '#2e2d24',
+            color: '#e0a84a',
+            borderRadius: 8,
+            padding: '8px 12px',
+            marginBottom: 12,
+          }}
+        >
+          Savitramma needs fever tablet (Chitti)
+        </div>
+        <ul className="stack" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {NEEDED_MEDICINES.map((item) => (
+            <li key={item.name} className="row row--between">
+              <div>
+                <strong>{item.name}</strong>
+                <p className="section-header__subtitle">{item.note}</p>
+              </div>
+              <span className="section-header__subtitle">{item.status}</span>
+            </li>
+          ))}
+        </ul>
+      </Card>
+
 
       {/* Daily reminders: one row per fixed slot with a taken toggle */}
       <Card title={t('pages.medicines.remindersTitle')}>

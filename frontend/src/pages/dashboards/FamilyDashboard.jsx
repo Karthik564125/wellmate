@@ -11,6 +11,7 @@ import { Timeline } from '../../components/Timeline.jsx';
 import { Modal } from '../../components/Modal.jsx';
 import { useToast } from '../../components/ToastProvider.jsx';
 import { useEmergencyAlert } from '../../context/EmergencyAlertContext.jsx';
+import { useCareRequests } from '../../context/CareRequestContext.jsx';
 import { useTranslation } from '../../i18n/LanguageContext.jsx';
 import { listDemoAppointments, updateDemoAppointment } from '../../api/appointments.js';
 import {
@@ -142,6 +143,9 @@ export function FamilyDashboard() {
   const { show } = useToast();
   // Active SOS alert (if any) raised from the elder's dashboard.
   const { alert, clearAlert } = useEmergencyAlert();
+  // Nearby care requests a volunteer has responded to (e.g. "available to bring sugar tablets").
+  const { requests: careRequests } = useCareRequests();
+  const volunteerUpdates = careRequests.filter((request) => request.status === 'responded');
   // Help requests have their own sub-route (/dashboard/family/requests); there this page shows only the help card.
   const showRequests = useLocation().pathname.endsWith('/requests');
 
@@ -332,6 +336,23 @@ export function FamilyDashboard() {
         </div>
       )}
 
+      {/* Volunteer response banner: shown as soon as a nearby volunteer responds to a care request. */}
+      {volunteerUpdates.map((request) => (
+        <div key={request.id} className="care-request-banner" role="status">
+          <span className="emergency-banner__icon" aria-hidden="true">
+            {request.response === 'available' ? '🙋' : 'ℹ️'}
+          </span>
+          <div className="emergency-banner__text">
+            <strong>{request.response === 'available' ? 'Volunteer available' : 'Volunteer update'}</strong>
+            <p>
+              {request.response === 'available'
+                ? `${request.volunteerName} is available to ${request.actionText}.`
+                : `${request.volunteerName} is not available to ${request.actionText} right now.`}
+            </p>
+          </div>
+        </div>
+      ))}
+
       {!showRequests && (
       <>
       {/* Hero headline matching family-care-hub.html */}
@@ -424,9 +445,10 @@ export function FamilyDashboard() {
         </Card>
       </div>
 
-      {/* Parent details and conditions */}
+      {/* Savitramma's health stats, emergency address and everyday activities.
+          These values are placeholders (mock data) until the API is connected. */}
       <div style={AUTO_GRID}>
-        <Card title={t('family.conditionsTitle')}>
+        <Card title="Savitramma's present health stats">
           <ul style={LIST_RESET}>
             {elder.conditions.map((condition) => (
               <li key={condition.id}>
@@ -434,12 +456,12 @@ export function FamilyDashboard() {
               </li>
             ))}
           </ul>
+          <p style={{ marginTop: '1rem' }}>
+            Blood group: <strong>{elder.bloodGroup}</strong>
+          </p>
         </Card>
 
-        <Card title={t('family.vitalsTitle')}>
-          <p>
-            {t('family.bloodGroup')}: <strong>{elder.bloodGroup}</strong>
-          </p>
+        <Card title="Emergency address">
           <p>
             {t('family.phone')}: <a href={toTelHref(elder.phone)}>{elder.phone}</a>
           </p>
@@ -448,7 +470,7 @@ export function FamilyDashboard() {
           </p>
         </Card>
 
-        <Card title={t('family.activityTitle')}>
+        <Card title="Today activity">
           {ACTIVITY_LOG.length === 0 ? (
             <p>{t('family.noActivity')}</p>
           ) : (

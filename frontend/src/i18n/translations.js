@@ -405,6 +405,16 @@ const translations = {
       notifNewRequest: 'New help request',
       dismiss: 'Dismiss',
       noNotifications: 'No notifications right now.',
+      careRequestsTitle: "Today's immediate tasks available",
+      careRequestsSubtitle: 'Quick asks from elders near you that need a response today. Let them know if you can help.',
+      noCareRequests: 'No nearby help needed right now.',
+      available: 'Available',
+      notAvailable: 'Not available',
+      taken: 'Taken',
+      youMarkedAvailable: 'You marked yourself as available for this.',
+      youMarkedNotAvailable: 'You marked yourself as not available for this.',
+      toastMarkedAvailable: 'Marked as available. The family has been notified.',
+      toastMarkedNotAvailable: 'Marked as not available.',
     },
     // Feature pages: appointments, medicines, care team, cab transport, insurance and profile
     pages: {
@@ -1184,6 +1194,16 @@ const translations = {
       notifNewRequest: 'కొత్త సహాయ అభ్యర్థన',
       dismiss: 'తొలగించు',
       noNotifications: 'ప్రస్తుతం నోటిఫికేషన్లు లేవు.',
+      careRequestsTitle: 'ఈ రోజు తక్షణ పనులు అందుబాటులో ఉన్నాయి',
+      careRequestsSubtitle: 'ఈ రోజు స్పందన అవసరమైన మీ దగ్గరలోని పెద్దవారి చిన్న అభ్యర్థనలు. మీరు సహాయం చేయగలిగితే వారికి తెలియజేయండి.',
+      noCareRequests: 'ప్రస్తుతం సమీపంలో సహాయం అవసరం లేదు.',
+      available: 'అందుబాటులో ఉన్నాను',
+      notAvailable: 'అందుబాటులో లేను',
+      taken: 'తీసుకోబడింది',
+      youMarkedAvailable: 'మీరు దీనికి అందుబాటులో ఉన్నట్లు గుర్తించారు.',
+      youMarkedNotAvailable: 'మీరు దీనికి అందుబాటులో లేనట్లు గుర్తించారు.',
+      toastMarkedAvailable: 'అందుబాటులో ఉన్నట్లు గుర్తించారు. కుటుంబానికి తెలియజేయబడింది.',
+      toastMarkedNotAvailable: 'అందుబాటులో లేనట్లు గుర్తించారు.',
     },
     // Feature pages (Telugu): appointments, medicines, care team, cab transport, insurance and profile
     pages: {
